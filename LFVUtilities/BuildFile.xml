@@ -1,0 +1,7 @@
+<use   name="boost"/>
+<use   name="boost_python"/>
+<use   name="python"/>
+<use   name="root"/>
+<export>
+        <lib   name="1"/>
+</export>
