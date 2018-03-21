@@ -41,8 +41,6 @@ class HvyResHistos(PhysObjHistos):
 
         PhysObjHistos.__init__(self,-1,name,mcType)
        
-        self.mcType = mcType
-
         # Setup Histograms
         self.dict_histosResol= {} #Resolution Histos
         if mcType is "reco":

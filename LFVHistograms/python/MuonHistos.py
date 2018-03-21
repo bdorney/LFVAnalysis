@@ -76,7 +76,7 @@ class MuonIsoHistos:
 
         self.isoTrackerBased03 = r.TH1F("%s_%s_isoTrkBased03_%s"%(prefix,physObj,selLevel),
                                         "%s isoTrkBased03 - %s"%(physObj,selLevel),
-                                        400,-0.5,99.5)
+                                        110,-0.05,1.05)
 
         return
 
@@ -127,11 +127,15 @@ class MuonHistos(PhysObjHistos):
             
             dirSelLevel.mkdir("Identification")
             dirId = dirSelLevel.GetDirectory("Identification")
-            self.dict_histosId[lvl].write(dirId)
+            dirId.mkdir(self.mcType)
+            dirMCLevel_Id = dirId.GetDirectory(self.mcType)
+            self.dict_histosId[lvl].write(dirMCLevel_Id)
 
             dirSelLevel.mkdir("Isolation")
             dirIso = dirSelLevel.GetDirectory("Isolation")
-            self.dict_histosIso[lvl].write(dirIso)
+            dirIso.mkdir(self.mcType)
+            dirMCLevel_Iso = dirIso.GetDirectory(self.mcType)
+            self.dict_histosIso[lvl].write(dirMCLevel_Iso)
 
         outFile.Close()
 
