@@ -1,7 +1,7 @@
 import ROOT as r
 
 class identificationHistos:
-    def __init__(self, listIdLabels, physObj="mu", selLevel="all", mcType=None):
+    def __init__(self, listIdLabels=None, physObj="mu", selLevel="all", mcType=None):
         """
         listIdLabels - list of strings specifying ID labels
         physObj - string specifying physics object type
@@ -14,17 +14,19 @@ class identificationHistos:
             prefix = "h_%s"%mcType
 
         # Make the label histogram and set the labels
-        self.idLabel = r.TH1F("%s_%s_idLabel_%s"%(prefix,physObj,selLevel),
-                              "%s Id Label - %s"%(physObj, selLevel), 
-                              len(listIdLabels),0.5,len(listIdLabels)+0.5
-                              )
-        for binX,label in enumerate(listIdLabels):
-            self.idLabel.GetXaxis().SetBinLabel(binX+1,label)
+        self.idLabel = None
+        if listIdLabels is not None:
+            self.idLabel = r.TH1F("%s_%s_idLabel_%s"%(prefix,physObj,selLevel),
+                                  "%s Id Label - %s"%(physObj, selLevel), 
+                                  len(listIdLabels),0.5,len(listIdLabels)+0.5
+                                  )
+            for binX,label in enumerate(listIdLabels):
+                self.idLabel.GetXaxis().SetBinLabel(binX+1,label)
 
         # Make impact parameter histograms
         self.dxy = r.TH1F("%s_%s_dxy_%s"%(prefix,physObj,selLevel),
                           "%s d_{xy} - %s"%(physObj, selLevel),
-                          100,-0.5,9.5)
+                          110,-5.5,5.5)
         self.dz = r.TH1F("%s_%s_dz_%s"%(prefix,physObj,selLevel),
                           "%s d_{z} - %s"%(physObj, selLevel),
                           210,-10.5,10.5)
@@ -43,7 +45,8 @@ class identificationHistos:
 
         directory.cd()
 
-        self.idLabel.Write()
+        if self.idLabel is not None:
+            self.idLabel.Write()
         self.dxy.Write()
         self.dz.Write()
         self.normChi2.Write()

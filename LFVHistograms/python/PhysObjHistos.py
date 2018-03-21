@@ -10,7 +10,9 @@ class PhysObjHistos:
         name - Only used for complex objects (e.g. Jets) which don't have a pdgId
         mcType - string specifying Monte Carlo data tier, e.g. gen or reco
         """
-        
+
+        self.mcType = mcType
+
         # Determine particle name
         dict_pdgId = {
             11:"el",
@@ -50,7 +52,10 @@ class PhysObjHistos:
             
             dirSelLevel.mkdir("Kinematics")
             dirKin = dirSelLevel.GetDirectory("Kinematics")
-            self.dict_histosKin[lvl].write(dirKin)
+
+            dirKin.mkdir(self.mcType)
+            dirMCLevel = dirKin.GetDirectory(self.mcType)
+            self.dict_histosKin[lvl].write(dirMCLevel)
 
         outFile.Close()
 
