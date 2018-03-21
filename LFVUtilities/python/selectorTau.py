@@ -106,6 +106,8 @@ def getSelectedTaus(event, selDict, numTaus, delim="-", listOfBranchNames=None, 
             # Store Other Properties
             thisTau.charge = event.tau_charge[idx]
 
+            thisTau.isPF = r.getValFromVectorBool(event.tau_isPFTau, idx)
+
             thisTau.againstElectronVLooseMVA6 = event.tau_againstElectronVLooseMVA6[idx]
             thisTau.againstMuonTight3 = event.tau_againstMuonTight3[idx]
             thisTau.decayModeFinding = event.tau_decayModeFinding[idx]

@@ -7,6 +7,8 @@ class Tau(PhysObj):
         PhysObj.__init__(self, px, py, pz, E, 15)
 
         # Id Variables
+        self.isPF = -1e10
+
         self.againstElectronVLooseMVA6 = -1e10
         self.againstMuonTight3 = -1e10
         self.decayModeFinding = -1e10
