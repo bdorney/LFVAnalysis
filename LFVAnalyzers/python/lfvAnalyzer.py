@@ -241,6 +241,7 @@ class lfvAnalyzer:
                 for muon in selectedMuons[lvl]:
                     # Fill Kinematic Histos
                     self.muHistos["reco"].dict_histosKin[lvl].charge.Fill(muon.charge)
+                    self.muHistos["reco"].dict_histosKin[lvl].energy.Fill(muon.E())
                     self.muHistos["reco"].dict_histosKin[lvl].eta.Fill(muon.eta())
                     self.muHistos["reco"].dict_histosKin[lvl].pt.Fill(muon.pt())
                     self.muHistos["reco"].dict_histosKin[lvl].pz.Fill(muon.pz())
@@ -257,7 +258,7 @@ class lfvAnalyzer:
                     self.muHistos["reco"].dict_histosId[lvl].dz.Fill(muon.dz)
                     self.muHistos["reco"].dict_histosId[lvl].normChi2.Fill(muon.normChi2)
                     
-                    #Fill Iso Histos
+                    # Fill Iso Histos
                     self.muHistos["reco"].dict_histosIso[lvl].isoTrackerBased03.Fill(muon.isoTrackerBased03)
 
             # Loop over taus
@@ -265,10 +266,20 @@ class lfvAnalyzer:
                 self.tauHistos["reco"].dict_histosKin[lvl].multi.Fill(len(selectedTaus[lvl])) # Multiplicity
                 for tau in selectedTaus[lvl]:
                     self.tauHistos["reco"].dict_histosKin[lvl].charge.Fill(tau.charge)
+                    self.tauHistos["reco"].dict_histosKin[lvl].energy.Fill(tau.E())
                     self.tauHistos["reco"].dict_histosKin[lvl].eta.Fill(tau.eta())
                     self.tauHistos["reco"].dict_histosKin[lvl].mass.Fill(tau.M())
                     self.tauHistos["reco"].dict_histosKin[lvl].pt.Fill(tau.pt())
             
+                    # Fill Id Histos
+                    self.tauHistos["reco"].dict_histosId[lvl].dxy.Fill(tau.dxy)
+                    self.tauHistos["reco"].dict_histosId[lvl].againstElVLooseMVA6.Fill(tau.againstElectronVLooseMVA6)
+                    self.tauHistos["reco"].dict_histosId[lvl].againstMuonTight3.Fill(tau.againstMuonTight3)
+                    self.tauHistos["reco"].dict_histosId[lvl].decayModeFinding.Fill(tau.decayModeFinding)
+
+                    # Fill Iso Histos
+                    self.tauHistos["reco"].dict_histosIso[lvl].tightIsoMVArun2v1DBoldDMwLT.Fill(tau.byTightIsolationMVArun2v1DBoldDMwLT)
+
             ##################################################################################
             ##################################################################################
             # Final Event Selection
