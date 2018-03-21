@@ -51,10 +51,10 @@ class lfvAnalyzer:
         self.hvyResHistos = {}
         if isData:
             # Placeholder
-            self.elHistos["reco"] = ElHistos()
-            self.muHistos["reco"] = MuonHistos()
-            self.tauHistos["reco"] = TauHistos()
-            self.hvyResHistos["reco"] = HvyResHistos()
+            self.elHistos["reco"] = ElHistos(mcType="reco")
+            self.muHistos["reco"] = MuonHistos(mcType="reco")
+            self.tauHistos["reco"] = TauHistos(mcType="reco")
+            self.hvyResHistos["reco"] = HvyResHistos(mcType="reco")
         else:
             for lvl in mcLevels:
                 self.elHistos[lvl] = ElHistos(mcType=lvl)
@@ -348,77 +348,77 @@ class lfvAnalyzer:
                 self.hvyResHistos["reco"].dict_histosResol[selLevels[-1]].mass_response.Fill(hvyResCandGen.M(),hvyResCand.M())
                 self.hvyResHistos["reco"].dict_histosResol[selLevels[-1]].massResol.Fill( (hvyResCand.M() - hvyResCandGen.M() ) / hvyResCandGen.M() )
 
-                print "reco info:"
-                print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
-                print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-                        candTuple[0].pdgId, 
-                        candTuple[0].status, 
-                        candTuple[0].charge, 
-                        candTuple[0].px(), 
-                        candTuple[0].py(), 
-                        candTuple[0].pz(), 
-                        candTuple[0].E(), 
-                        candTuple[0].pt(), 
-                        candTuple[0].eta(), 
-                        candTuple[0].M() )
-                print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-                        candTuple[1].pdgId, 
-                        candTuple[1].status, 
-                        candTuple[1].charge, 
-                        candTuple[1].px(), 
-                        candTuple[1].py(), 
-                        candTuple[1].pz(), 
-                        candTuple[1].E(), 
-                        candTuple[1].pt(), 
-                        candTuple[1].eta(), 
-                        candTuple[1].M() )
-                print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-                        hvyResCand.pdgId, 
-                        hvyResCand.status, 
-                        hvyResCand.charge, 
-                        hvyResCand.px(), 
-                        hvyResCand.py(), 
-                        hvyResCand.pz(), 
-                        hvyResCand.E(), 
-                        hvyResCand.pt(), 
-                        hvyResCand.eta(), 
-                        hvyResCand.M() )
+               # print "reco info:"
+               # print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
+               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+               #         candTuple[0].pdgId, 
+               #         candTuple[0].status, 
+               #         candTuple[0].charge, 
+               #         candTuple[0].px(), 
+               #         candTuple[0].py(), 
+               #         candTuple[0].pz(), 
+               #         candTuple[0].E(), 
+               #         candTuple[0].pt(), 
+               #         candTuple[0].eta(), 
+               #         candTuple[0].M() )
+               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+               #         candTuple[1].pdgId, 
+               #         candTuple[1].status, 
+               #         candTuple[1].charge, 
+               #         candTuple[1].px(), 
+               #         candTuple[1].py(), 
+               #         candTuple[1].pz(), 
+               #         candTuple[1].E(), 
+               #         candTuple[1].pt(), 
+               #         candTuple[1].eta(), 
+               #         candTuple[1].M() )
+               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+               #         hvyResCand.pdgId, 
+               #         hvyResCand.status, 
+               #         hvyResCand.charge, 
+               #         hvyResCand.px(), 
+               #         hvyResCand.py(), 
+               #         hvyResCand.pz(), 
+               #         hvyResCand.E(), 
+               #         hvyResCand.pt(), 
+               #         hvyResCand.eta(), 
+               #         hvyResCand.M() )
 
-                print "gen info:"
-                print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
-                print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-                        candTupleGen[0].pdgId, 
-                        candTupleGen[0].status, 
-                        candTupleGen[0].charge, 
-                        candTupleGen[0].px(), 
-                        candTupleGen[0].py(), 
-                        candTupleGen[0].pz(), 
-                        candTupleGen[0].E(), 
-                        candTupleGen[0].pt(), 
-                        candTupleGen[0].eta(), 
-                        candTupleGen[0].M() )
-                print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-                        candTupleGen[1].pdgId, 
-                        candTupleGen[1].status, 
-                        candTupleGen[1].charge, 
-                        candTupleGen[1].px(), 
-                        candTupleGen[1].py(), 
-                        candTupleGen[1].pz(), 
-                        candTupleGen[1].E(), 
-                        candTupleGen[1].pt(), 
-                        candTupleGen[1].eta(), 
-                        candTupleGen[1].M() )
-                print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-                        hvyResCandGen.pdgId, 
-                        hvyResCandGen.status, 
-                        hvyResCandGen.charge, 
-                        hvyResCandGen.px(), 
-                        hvyResCandGen.py(), 
-                        hvyResCandGen.pz(), 
-                        hvyResCandGen.E(), 
-                        hvyResCandGen.pt(), 
-                        hvyResCandGen.eta(), 
-                        hvyResCandGen.M() )
+               # print "gen info:"
+               # print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
+               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+               #         candTupleGen[0].pdgId, 
+               #         candTupleGen[0].status, 
+               #         candTupleGen[0].charge, 
+               #         candTupleGen[0].px(), 
+               #         candTupleGen[0].py(), 
+               #         candTupleGen[0].pz(), 
+               #         candTupleGen[0].E(), 
+               #         candTupleGen[0].pt(), 
+               #         candTupleGen[0].eta(), 
+               #         candTupleGen[0].M() )
+               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+               #         candTupleGen[1].pdgId, 
+               #         candTupleGen[1].status, 
+               #         candTupleGen[1].charge, 
+               #         candTupleGen[1].px(), 
+               #         candTupleGen[1].py(), 
+               #         candTupleGen[1].pz(), 
+               #         candTupleGen[1].E(), 
+               #         candTupleGen[1].pt(), 
+               #         candTupleGen[1].eta(), 
+               #         candTupleGen[1].M() )
+               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+               #         hvyResCandGen.pdgId, 
+               #         hvyResCandGen.status, 
+               #         hvyResCandGen.charge, 
+               #         hvyResCandGen.px(), 
+               #         hvyResCandGen.py(), 
+               #         hvyResCandGen.pz(), 
+               #         hvyResCandGen.E(), 
+               #         hvyResCandGen.pt(), 
+               #         hvyResCandGen.eta(), 
+               #         hvyResCandGen.M() )
         
         return
 
