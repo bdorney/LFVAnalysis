@@ -237,7 +237,7 @@ class lfvAnalyzer:
                     
                     # Fill Id Histos
                     for binX,idLabel in enumerate(elIdLabels):
-                        if getattr(electron, idLabel) > 0:
+                        if getattr(el, idLabel) > 0:
                             self.elHistos["reco"].dict_histosId[selLvl].idLabel.Fill(binX+1)
 
             # Loop over muons
@@ -342,6 +342,13 @@ class lfvAnalyzer:
                     if fourVec.M() > maxInvarMass:
                         maxInvarMass = fourVec.M()
                         candTuple = (dau1, dau2)
+                        pass
+                    pass
+                pass
+
+            # Make sure we selected a candidate tuple
+            if len(candTuple) != 2:
+                continue
 
             fourVec = candTuple[0].fourVector + candTuple[1].fourVector
             hvyResCand = PhysObj(fourVec.Px(), fourVec.Py(), fourVec.Pz(), fourVec.E())
@@ -349,6 +356,9 @@ class lfvAnalyzer:
             
             # Fill Reco level histos for hvy reso candidate - Kinematics
             fillKinematicHistos(hvyResCand, self.hvyResHistos["reco"].dict_histosKin[selLevels[-1]])
+
+            # Fill Daughter Histos
+            self.hvyResHistos["reco"].dict_dauHistos[selLevels[-1]].dR.Fill( dR(candTuple[0], candTuple[1]) )
 
             if not self.isData and self.anaGen:
                 candTupleGen = (selectedGenParts[self.sigPdgId1][0], selectedGenParts[self.sigPdgId2][0])
@@ -467,8 +477,8 @@ class lfvAnalyzer:
             self.sigPdgId1 = kwargs["sigPdgId1"]
         if "sigPdgId2" in kwargs:
             self.sigPdgId2 = kwargs["sigPdgId2"]
-        if "useGlobalMuonTrack" in kwargs["useGlobalMuonTrack"]
-            self.useGlobalMuonTrack = False 
+        if "useGlobalMuonTrack" in kwargs:
+            self.useGlobalMuonTrack = kwargs["useGlobalMuonTrack"]
         
         return
 
