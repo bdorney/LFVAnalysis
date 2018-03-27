@@ -11,6 +11,7 @@
 
 # Don't ignore subdirectories
 !*/
+default/*
 
 # Don't ignore python
 !*.py
