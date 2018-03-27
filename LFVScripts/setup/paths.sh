@@ -1,12 +1,12 @@
 #!/bin/zsh
 
 #export JOB_PATH=<your path>
-if [ -z "$JOB_PATH" ]
-then
-    echo "JOB_PATH not set, please set JOB_PATH to the directory of your choice"
-    echo " (export JOB_PATH=<your_path>) and then rerun this script"
-    return
-fi
+#if [ -z "$JOB_PATH" ]
+#then
+#    echo "JOB_PATH not set, please set JOB_PATH to the directory of your choice"
+#    echo " (export JOB_PATH=<your_path>) and then rerun this script"
+#    return
+#fi
 
 if [ -z "$CMSSW_BASE" ]
 then
