@@ -39,7 +39,7 @@ class PhysObj:
         return self.fourVector.Eta()
 
     def phi(self):
-        return setl.fourVector.Phi()
+        return self.fourVector.Phi()
 
     def px(self):
         return self.fourVector.Px()
