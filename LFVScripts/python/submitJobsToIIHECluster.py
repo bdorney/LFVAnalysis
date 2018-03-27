@@ -24,6 +24,7 @@ if __name__ == '__main__':
     # Prepare the commands for making the
     from LFVAnalysis.LFVUtilities.wrappers import envCheck, runCommand
     envCheck('JOB_PATH')
+    envCheck('LFV_PATH')
 
     import datetime
     startTime = datetime.datetime.now().strftime("%Y.%m.%d.%H.%M")
@@ -84,15 +85,20 @@ if __name__ == '__main__':
         script.write('source $VO_CMS_SW_DIR/cmsset_default.sh\n')
         script.write('cd %s/src\n'%options.cmssw_base)
         script.write('eval `scram runtime -sh`\n')
+        script.write('source $CMSSW_BASE/src/LFVAnalysis/LFVScripts/setup/paths.sh')
         script.write('cd $nodeDir\n')
         
-        pythonCmd = 'python %s/src/LFVAnalysis/Examples/performLFVAna.py -i%s -o%s --sigPdgId1=%i --sigPdgId2=%i'%(
+        #pythonCmd = 'python %s/src/LFVAnalysis/LFVScripts/python/performLFVAna.py -i%s -o%s --sigPdgId1=%i --sigPdgId2=%i'%(
+        pythonCmd = 'performLFVAna.py -i%s -o%s --sigPdgId1=%i --sigPdgId2=%i --mindR=%f'%(
                 options.cmssw_base, 
                 run, 
                 outFileName, 
                 options.sigPdgId1, 
-                options.sigPdgId2)
+                options.sigPdgId2,
+                options.mindR)
         pythonCmd += ' -t%s'%(options.triggers)
+        if options.oppositeSign:
+            pythonCmd += ' --oppositeSign'
         if options.debug:
             pythonCmd += ' --debug'
             print pythonCmd
