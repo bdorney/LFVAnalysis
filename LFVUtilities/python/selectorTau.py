@@ -20,7 +20,7 @@ for lvl in selLevels:
 tauSelection["all"]["tau_pt"] = (0, "ge")
 
 # Kinematic Selection
-tauSelection["kin"]["tau_pt"] = (20, "ge")
+tauSelection["kin"]["tau_pt"] = (30, "ge")
 tauSelection["kin"]["tau_eta"] = (2.3, "fabs-le")
 
 # Kinematic & Id Selection
