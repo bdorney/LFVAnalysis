@@ -6,5 +6,8 @@ class Electron(PhysObj):
     def __init__(self, px, py, pz, E):
         PhysObj.__init__(self, px, py, pz, E, 11)
 
+        # Id Variables
+        self.isHEEP = -1
+
         return
 

@@ -4,9 +4,10 @@ from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
 
 import math as m
 import os
+import ROOT as r
 
 bitRefBranches = [
-
+        "gsf_isHeepV7"
         ]
 
 elSelection = nesteddict()
@@ -18,8 +19,8 @@ for lvl in selLevels:
 elSelection["all"]["gsf_energy"] = (0, "ge")
 
 # Kinematic Selection
-elSelection["kin"]["gsf_energy"] = (10, "g")
-elSelection["kin"]["gsf_eta"] = (2.4, "fabs-le")
+elSelection["kin"]["gsf_energy"] = (50, "g")
+#elSelection["kin"]["gsf_eta"] = (2.4, "fabs-le")
 
 # Kinematic & Id Selection
 #elSelection["kinId"]["mu_isGlobalMuon"] = (1,"eq")
@@ -108,6 +109,8 @@ def getSelectedElectrons(event, selDict, numElectrons, delim="-", listOfBranchNa
             thisElectron.dxy = event.gsf_dxy[idx]
             thisElectron.dz = event.gsf_dz[idx]
 
+            thisElectron.isHEEP = r.getValFromVectorBool(event.gsf_isHeepV7, idx)
+            
             if debug:
                 print "| %i | %f | %f | %f | %f |"%(idx, thisElectron.px(), thisElectron.py(), thisElectron.pz(), thisElectron.E())
             
