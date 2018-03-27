@@ -2,6 +2,32 @@ import ROOT as r
 from LFVAnalysis.LFVHistograms.PhysObjHistos import PhysObjHistos
 from LFVAnalysis.LFVUtilities.utilities import selLevels
 
+class HvyResDaughterHistos:
+    def __init__(self, physObj="HvyRes", selLevel="all", mcType=None):
+        """
+        physObj - string specifying physics object type
+        selLevel - string specifying the selection type
+        """
+
+        prefix = "h_data"
+        if mcType is not None:
+            prefix = "h_%s"%mcType
+
+        self.dR = r.TH1F("%s_%s_dR_%s"%(prefix,physObj,selLevel),
+                         "Reco Level %s dR(dau1,dau2) - %s"%(physObj,selLevel),
+                         110,-0.05,3.05)
+
+        return
+
+    def write(self, directory):
+        """
+        directory - TDirectory histograms should be written too
+        """
+
+        directory.cd()
+        self.dR.Write()
+
+        return
 class HvyResMassResolHistos:
     def __init__(self, physObj="HvyRes", selLevel="all"):
         """
@@ -42,10 +68,15 @@ class HvyResHistos(PhysObjHistos):
         PhysObjHistos.__init__(self,-1,name,mcType)
        
         # Setup Histograms
-        self.dict_histosResol= {} #Resolution Histos
+        self.dict_histosResol = {} #Resolution Histos
         if mcType == "reco":
             for lvl in selLevels:
                 self.dict_histosResol[lvl] = HvyResMassResolHistos(self.physObjType, lvl)
+        
+        self.dict_dauHistos = {} #Daughter Histos
+        if mcType == "reco":
+            for lvl in selLevels:
+                self.dict_dauHistos[mcType] = HvyResDaughterHistos(self.physObjType, lvl, mcType)
 
         return
 
@@ -69,6 +100,13 @@ class HvyResHistos(PhysObjHistos):
                 dirSelLevel.mkdir("MassResolution")
                 dirMassRes = dirSelLevel.GetDirectory("MassResolution")
                 self.dict_histosResol[lvl].write(dirMassRes)
+
+            dirSelLevel.mkdir("DaughterHistos")
+            dirDauHistos = dirSelLevel.GetDirectory("DaughterHistos")
+            if self.mcType == "reco":
+                dirDauHistos.mkdir("reco")
+                dirReco = dirDauHistos.GetDirectory("reco")
+                self.dict_dauHistos[lvl].write(dirReco)
 
         outFile.Close()
 
