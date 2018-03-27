@@ -29,4 +29,4 @@ else
     source $VENV_BASE/default/bin/activate
 fi
 
-echo "finished"
+echo "now running the LFV default virtualenv"

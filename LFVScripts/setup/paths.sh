@@ -15,6 +15,9 @@ then
     return
 fi
 
+# Set python virtualenv
+source $LFV_PATH/LFVScripts/setup/createVirtualEnv.sh
+
 # Export project
 export LFV_PATH=$CMSSW_BASE/src/LFVAnalysis
 
@@ -24,4 +27,5 @@ export PATH=$PATH:$CMSSW_BASE/src/LFVAnalysis/LFVScripts/python
 # Done
 echo JOB_PATH $JOB_PATH
 echo LFV_PATH $LFV_PATH
+
 echo "setup complete"
