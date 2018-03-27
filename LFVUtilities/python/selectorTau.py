@@ -4,6 +4,7 @@ from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
 
 import math as m
 import os
+import ROOT as r
 
 bitRefBranches = [
         "tau_isPFTau",
