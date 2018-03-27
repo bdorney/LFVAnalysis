@@ -37,14 +37,14 @@ class lfvAnalyzer:
 
         # Analysis control flags
         # can be set via the setAnalysisFlags() method
-        self.anaGen = anaGen            #analyze gen level information
-        self.anaReco = anaReco          #analyze reco level information
-        self.forceDaughterPairOS = True #If True require lepton pair to be oppositely charged
-        self.isData = isData            #whether input file is data or not
-        self.minDaughterPairdR = -1.    #Minimum dR allowed between Hvy Res daughters
-        self.sigPdgId1 = 13             #Particle Id of Hvy Resonance Daughter 1
-        self.sigPdgId2 = 15             #Particle Id of Hvy Resonance Daughter 2
-        self.useGlobalMuonTrack = False #If True (False) use Global (IBT) muon track
+        self.anaGen = anaGen                #analyze gen level information
+        self.anaReco = anaReco              #analyze reco level information
+        self.forceDaughterPairOS = False    #If True require lepton pair to be oppositely charged
+        self.isData = isData                #whether input file is data or not
+        self.minDaughterPairdR = -1.        #Minimum dR allowed between Hvy Res daughters
+        self.sigPdgId1 = 13                 #Particle Id of Hvy Resonance Daughter 1
+        self.sigPdgId2 = 15                 #Particle Id of Hvy Resonance Daughter 2
+        self.useGlobalMuonTrack = False     #If True (False) use Global (IBT) muon track
 
         # Make Histograms
         self.elHistos = {}
