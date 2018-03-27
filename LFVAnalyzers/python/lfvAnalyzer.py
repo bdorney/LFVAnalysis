@@ -1,14 +1,14 @@
-from LFVAnalysis.LFVHistograms.ElHistos import ElHistos
+from LFVAnalysis.LFVHistograms.ElHistos import elIdLabels, ElHistos
 from LFVAnalysis.LFVHistograms.HvyResHistos import HvyResHistos
 from LFVAnalysis.LFVHistograms.MuonHistos import muonIdLabels, muonhitLabels, MuonHistos
 from LFVAnalysis.LFVHistograms.PhysObjHistos import PhysObjHistos
-from LFVAnalysis.LFVHistograms.TauHistos import TauHistos
+from LFVAnalysis.LFVHistograms.TauHistos import tauIdLabels, TauHistos
 
 from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
 from LFVAnalysis.LFVUtilities.selectorEl import getSelectedElectrons, elSelection
 from LFVAnalysis.LFVUtilities.selectorMuon import getSelectedMuons, muonSelection 
 from LFVAnalysis.LFVUtilities.selectorTau import getSelectedTaus, tauSelection 
-from LFVAnalysis.LFVUtilities.utilities import fillKinematicHistos, selLevels, mcLevels
+from LFVAnalysis.LFVUtilities.utilities import dR, fillKinematicHistos, selLevels, mcLevels
 
 from LFVAnalysis.LFVObjects.physicsObject import *
 
@@ -36,14 +36,15 @@ class lfvAnalyzer:
             exit(os.EX_DATAERR)
 
         # Analysis control flags
-        self.isData = isData #whether input file is data or not
-        self.anaGen = anaGen #analyze gen level information
-        self.anaReco = anaReco #analyze reco level information
-        self.sigPdgId1 = 13 #Particle Id of Hvy Resonance Daughter 1
-        self.sigPdgId2 = 15 #Particle Id of Hvy Resonance Daughter 2
-
+        # can be set via the setAnalysisFlags() method
+        self.anaGen = anaGen            #analyze gen level information
+        self.anaReco = anaReco          #analyze reco level information
+        self.forceDaughterPairOS = True #If True require lepton pair to be oppositely charged
+        self.isData = isData            #whether input file is data or not
+        self.minDaughterPairdR = -1.    #Minimum dR allowed between Hvy Res daughters
+        self.sigPdgId1 = 13             #Particle Id of Hvy Resonance Daughter 1
+        self.sigPdgId2 = 15             #Particle Id of Hvy Resonance Daughter 2
         self.useGlobalMuonTrack = False #If True (False) use Global (IBT) muon track
-        self.forceDaughterPairOS = True        #If True require lepton pair to be oppositely charged
 
         # Make Histograms
         self.elHistos = {}
@@ -231,8 +232,14 @@ class lfvAnalyzer:
             for selLvl in selLevels:
                 self.elHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedEls[selLvl])) # Multiplicity
                 for el in selectedEls[selLvl]:
+                    # Fill Kinematic Histos
                     fillKinematicHistos(el, self.elHistos["reco"].dict_histosKin[selLvl])
-            
+                    
+                    # Fill Id Histos
+                    for binX,idLabel in enumerate(elIdLabels):
+                        if getattr(electron, idLabel) > 0:
+                            self.elHistos["reco"].dict_histosId[selLvl].idLabel.Fill(binX+1)
+
             # Loop over muons
             for selLvl in selLevels:
                 self.muHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedMuons[selLvl])) # Multiplicity
@@ -259,9 +266,14 @@ class lfvAnalyzer:
             for selLvl in selLevels:
                 self.tauHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedTaus[selLvl])) # Multiplicity
                 for tau in selectedTaus[selLvl]:
+                    # Fill Kinematic Histos
                     fillKinematicHistos(tau, self.tauHistos["reco"].dict_histosKin[selLvl])
             
                     # Fill Id Histos
+                    for binX,idLabel in enumerate(tauIdLabels):
+                        if getattr(tau, idLabel) > 0:
+                            self.tauHistos["reco"].dict_histosId[selLvl].idLabel.Fill(binX+1)
+                    
                     self.tauHistos["reco"].dict_histosId[selLvl].dxy.Fill(tau.dxy)
                     self.tauHistos["reco"].dict_histosId[selLvl].againstElVLooseMVA6.Fill(tau.againstElectronVLooseMVA6)
                     self.tauHistos["reco"].dict_histosId[selLvl].againstMuonTight3.Fill(tau.againstMuonTight3)
@@ -320,6 +332,11 @@ class lfvAnalyzer:
                     if self.forceDaughterPairOS:
                         if (dau1.charge * dau2.charge) > 0:
                             continue
+
+                    # Check angular separation between daughters
+                    if dR(dau1, dau2) < self.minDaughterPairdR:
+                        continue
+
                     # Construct four-vector and check if it has the highest invariant mass
                     fourVec = dau1.fourVector + dau2.fourVector
                     if fourVec.M() > maxInvarMass:
@@ -423,9 +440,11 @@ class lfvAnalyzer:
         
         return
 
-    def setAnalysisFlags(self, isData=False, anaGen=True, anaReco=True, sigPdgId1=13, sigPdgId2=15):
+    def setAnalysisFlags(self, **kwargs):
         """
         Sets the flags that control the behavior of a call of the analyze() method
+
+        The keyword is assumed to be the same as the variable name for simplicity
 
         isData - perform data analysis
         anaGen - perform the gen particle analysis, note ignored if isData is True
@@ -434,11 +453,22 @@ class lfvAnalyzer:
         sigPdgId2 - particle id of hvy resonance daughter 2
         """
 
-        self.isData = isData
-        self.anaGen = anaGen
-        self.anaReco = anaReco
-        self.sigPdgId1 = sigPdgId1
-        self.sigPdgId2 = sigPdgId2
+        if "anaGen" in kwargs:
+            self.anaGen = kwargs["anaGen"]
+        if "anaReco" in kwargs:
+            self.anaReco = kwargs["anaReco"]
+        if "forceDaughterPairOS" in kwargs:
+            self.forceDaughterPairOS = kwargs["forceDaughterPairOS"]
+        if "isData" in kwargs:
+            self.isData = kwargs["isData"]
+        if "minDaughterPairdR" in kwargs:
+            self.minDaughterPairdR = kwargs["minDaughterPairdR"] 
+        if "sigPdgId1" in kwargs:
+            self.sigPdgId1 = kwargs["sigPdgId1"]
+        if "sigPdgId2" in kwargs:
+            self.sigPdgId2 = kwargs["sigPdgId2"]
+        if "useGlobalMuonTrack" in kwargs["useGlobalMuonTrack"]
+            self.useGlobalMuonTrack = False 
         
         return
 

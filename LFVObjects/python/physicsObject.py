@@ -38,6 +38,9 @@ class PhysObj:
     def eta(self):
         return self.fourVector.Eta()
 
+    def phi(self):
+        return setl.fourVector.Phi()
+
     def px(self):
         return self.fourVector.Px()
     
