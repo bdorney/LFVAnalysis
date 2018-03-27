@@ -1,15 +1,9 @@
 #!/bin/env python
 
 if __name__ == '__main__':
-    from optparse import OptionParser
-    parser = OptionParser()
-   
-    parser.add_option("-d","--debug", action="store_true", dest="debug",
-            help="flag for printing debug information", metavar="debug")
+    from LFVAnalysis.LFVScripts.lfvOptions import parser
     parser.add_option("-i","--infilename", type="string", dest="inFile", default=None,
             help="input file to be analyzed", metavar="inFile")
-    parser.add_option("--isData", action="store_true", dest="isData",
-            help="Specify if sample is Data; otherwise will be treated as MC", metavar="isData")
     parser.add_option("-n","--numEvts", type="int", dest="numEvts", default=-1,
             help="Number of events to analyze, -1 results in all events", metavar="numEvts")
     parser.add_option("-o","--outfilename", type="string", dest="outFile", default="lfvOutput.root",
@@ -20,12 +14,6 @@ if __name__ == '__main__':
             help="Prints a processing statement after this number of events", metavar="printLvl")
     parser.add_option("--printTrig",action="store_true", dest="printTrig",
             help="For each event print the trigger decision", metavar="printTrig")
-    parser.add_option("--sigPdgId1", type="int", dest="sigPdgId1", default=13,
-            help="PdgId of the first daughter of the heavy resonance candidate", metavar="sigPdgId1")
-    parser.add_option("--sigPdgId2", type="int", dest="sigPdgId2", default=15,
-            help="PdgId of the second daughter of the heavy resonance candidate", metavar="sigPdgId2")
-    parser.add_option("-t","--triggers",type="string", dest="triggers", default="trig_HLT_Mu50_accept,trig_HLT_TkMu50_accept",
-            help="List of triggers to be used", metavar="triggers")
     parser.set_defaults(
             isData=False,
             printGen=False,

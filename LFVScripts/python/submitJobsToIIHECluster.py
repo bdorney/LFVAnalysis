@@ -3,23 +3,13 @@
 if __name__ == '__main__':
     import os
     
-    from optparse import OptionParser
-    parser = OptionParser()
-  
+    from LFVAnalysis.LFVScripts.lfvOptions import parser
     parser.add_option("--cmssw",type="string",dest="cmssw_base", default="/user/dorney/CMSSW/CMSSW_8_0_17",
             help="physical file path for your $CMSSW_BASE directory",metavar="cmssw")
-    parser.add_option("-d","--debug", action="store_true", dest="debug",
-            help="prints debug information, note no jobs are submitted", metavar="debug")
     parser.add_option("-i","--infilename", type="string", dest="inFile", default=None,
             help="input file containing TFiles files containing TTrees to be analyzed, one file per line", metavar="inFile")
     parser.add_option("-q","--queue", type="string", dest="queue", default="express",
             help="queue to submit your jobs to", metavar="queue")
-    parser.add_option("--sigPdgId1", type="int", dest="sigPdgId1", default=13,
-            help="PdgId of the first daughter of the heavy resonance candidate", metavar="sigPdgId1")
-    parser.add_option("--sigPdgId2", type="int", dest="sigPdgId2", default=15,
-            help="PdgId of the second daughter of the heavy resonance candidate", metavar="sigPdgId2")
-    parser.add_option("-t","--triggers",type="string", dest="triggers", default="trig_HLT_Mu50_accept,trig_HLT_TkMu50_accept",
-            help="List of triggers to be used", metavar="triggers")
 
     (options, args) = parser.parse_args()
 
