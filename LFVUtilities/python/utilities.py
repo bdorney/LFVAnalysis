@@ -24,6 +24,18 @@ supOperators = (
         "le"    #less than or equal too
         )
 
+def dR(cand1, cand2):
+    """
+    Calculates the dR between cand1 and cand2
+
+    cand1 - an object inheriting from PhysObj
+    cand2 - an object inheriting from PhysObj
+    """
+
+    from math import sqrt
+
+    return sqrt( (cand1.eta() - cand2.eta())**2 + (cand1.phi() - cand2.phi())**2 )
+
 def fillKinematicHistos(candidate, kinHistos):
     """
     Fills kinematic histos for an particle candidate.
