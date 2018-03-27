@@ -42,7 +42,8 @@ class lfvAnalyzer:
         self.sigPdgId1 = 13 #Particle Id of Hvy Resonance Daughter 1
         self.sigPdgId2 = 15 #Particle Id of Hvy Resonance Daughter 2
 
-        self.useGlobalMuonTrack = False
+        self.useGlobalMuonTrack = False #If True (False) use Global (IBT) muon track
+        self.forceDaughterPairOS = True        #If True require lepton pair to be oppositely charged
 
         # Make Histograms
         self.elHistos = {}
@@ -315,6 +316,11 @@ class lfvAnalyzer:
             candTuple = ()
             for dau1 in selectedDauPart1:
                 for dau2 in selectedDauPart2:
+                    # Do we require daughter particles to be oppsitely charged?
+                    if self.forceDaughterPairOS:
+                        if (dau1.charge * dau2.charge) > 0:
+                            continue
+                    # Construct four-vector and check if it has the highest invariant mass
                     fourVec = dau1.fourVector + dau2.fourVector
                     if fourVec.M() > maxInvarMass:
                         maxInvarMass = fourVec.M()
