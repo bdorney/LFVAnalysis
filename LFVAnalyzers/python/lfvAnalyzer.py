@@ -8,7 +8,7 @@ from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
 from LFVAnalysis.LFVUtilities.selectorEl import getSelectedElectrons, elSelection
 from LFVAnalysis.LFVUtilities.selectorMuon import getSelectedMuons, muonSelection 
 from LFVAnalysis.LFVUtilities.selectorTau import getSelectedTaus, tauSelection 
-from LFVAnalysis.LFVUtilities.utilities import selLevels, mcLevels
+from LFVAnalysis.LFVUtilities.utilities import fillKinematicHistos, selLevels, mcLevels
 
 from LFVAnalysis.LFVObjects.physicsObject import *
 
@@ -56,15 +56,15 @@ class lfvAnalyzer:
             self.tauHistos["reco"] = TauHistos(mcType="reco")
             self.hvyResHistos["reco"] = HvyResHistos(mcType="reco")
         else:
-            for lvl in mcLevels:
-                self.elHistos[lvl] = ElHistos(mcType=lvl)
-                self.muHistos[lvl] = MuonHistos(mcType=lvl)
-                self.tauHistos[lvl] = TauHistos(mcType=lvl)
-                self.hvyResHistos[lvl] = HvyResHistos(mcType=lvl)
+            for mcLvl in mcLevels:
+                self.elHistos[mcLvl] = ElHistos(mcType=mcLvl)
+                self.muHistos[mcLvl] = MuonHistos(mcType=mcLvl)
+                self.tauHistos[mcLvl] = TauHistos(mcType=mcLvl)
+                self.hvyResHistos[mcLvl] = HvyResHistos(mcType=mcLvl)
 
         return
 
-    def analyze(self, listOfTriggers=None, printLvl=1000, numEvts=-1, printGenList=False, printTrigInfo=False):
+    def analyze(self, listOfTriggers=None, printLvl=1000, numEvts=-1, printGenList=False, printTrigInfo=False, printHvyResInfo=False):
         """
         Analyzes data stored in self.dataTree and prints the 
         number of processed events every printLvl number of events
@@ -76,6 +76,9 @@ class lfvAnalyzer:
         printGenList   - if true prints a table, in markdown format, of pdgId 
                          and 4-vectors of gen particles, if self.isData is False 
                          does nothing
+
+        printHvyResInfo- if true prints a table, in markdown format, of info on
+                         selected heavy resonance candidate at gen and reco level
         """
 
         # Tell the user which file we are analyzing
@@ -174,25 +177,25 @@ class lfvAnalyzer:
             ##################################################################################
             # Get selected electrons
             selectedEls = nesteddict()
-            for lvl in selLevels:
-                selectedEls[lvl] = getSelectedElectrons(event, elSelection[lvl], event.gsf_n, listOfBranchNames=listBNames)
+            for selLvl in selLevels:
+                selectedEls[selLvl] = getSelectedElectrons(event, elSelection[selLvl], event.gsf_n, listOfBranchNames=listBNames)
             
             # Get selected muons
             selectedMuons = nesteddict()
-            for lvl in selLevels:
-                selectedMuons[lvl] = getSelectedMuons(event, muonSelection[lvl], event.mu_n, listOfBranchNames=listBNames, useGlobalTrack=self.useGlobalMuonTrack)
+            for selLvl in selLevels:
+                selectedMuons[selLvl] = getSelectedMuons(event, muonSelection[selLvl], event.mu_n, listOfBranchNames=listBNames, useGlobalTrack=self.useGlobalMuonTrack)
 
             # Get selected taus
             selectedTaus = nesteddict()
-            for lvl in selLevels:
-                selectedTaus[lvl] = getSelectedTaus(event, tauSelection[lvl], event.tau_n, listOfBranchNames=listBNames)
+            for selLvl in selLevels:
+                selectedTaus[selLvl] = getSelectedTaus(event, tauSelection[selLvl], event.tau_n, listOfBranchNames=listBNames)
 
             # Fill Histograms - Gen Level
             ##################################################################################
             if not self.isData and self.anaGen:
                 genMulti = nesteddict() # Container to track the multiplicity of different particle species
-                for lvl in selLevels:
-                    genMulti[lvl] = nesteddict()
+                for selLvl in selLevels:
+                    genMulti[selLvl] = nesteddict()
 
                 for pdgId,listOfParts in selectedGenParts.iteritems():
                     for genPart in listOfParts:
@@ -205,80 +208,66 @@ class lfvAnalyzer:
 
                         # Fill histograms: Electrons - Kinematics
                         if abs(genPart.pdgId) == 11:
-                            self.elHistos["gen"].dict_histosKin["all"].charge.Fill(genPart.charge)
-                            self.elHistos["gen"].dict_histosKin["all"].energy.Fill(genPart.E())
-                            self.elHistos["gen"].dict_histosKin["all"].eta.Fill(genPart.eta())
-                            self.elHistos["gen"].dict_histosKin["all"].mass.Fill(genPart.M())
-                            self.elHistos["gen"].dict_histosKin["all"].pt.Fill(genPart.pt())
-                    
+                            fillKinematicHistos(genPart, self.elHistos["gen"].dict_histosKin["all"])
+
                         # Fill histograms: Muons - Kinematics
                         if abs(genPart.pdgId) == 13:
-                            self.muHistos["gen"].dict_histosKin["all"].charge.Fill(genPart.charge)
-                            self.muHistos["gen"].dict_histosKin["all"].eta.Fill(genPart.eta())
-                            self.muHistos["gen"].dict_histosKin["all"].mass.Fill(genPart.M())
-                            self.muHistos["gen"].dict_histosKin["all"].pt.Fill(genPart.pt())
+                            fillKinematicHistos(genPart, self.muHistos["gen"].dict_histosKin["all"])
                         
                         # Fill histograms: Taus - Kinematics
                         if abs(genPart.pdgId) == 15:
-                            self.tauHistos["gen"].dict_histosKin["all"].charge.Fill(genPart.charge)
-                            self.tauHistos["gen"].dict_histosKin["all"].eta.Fill(genPart.eta())
-                            self.tauHistos["gen"].dict_histosKin["all"].mass.Fill(genPart.M())
-                            self.tauHistos["gen"].dict_histosKin["all"].pt.Fill(genPart.pt())
+                            fillKinematicHistos(genPart, self.tauHistos["gen"].dict_histosKin["all"])
+
+                # Fill gen multiplicity
+                for pdgId,multi in genMulti["all"].iteritems():
+                    if pdgId == 11: self.elHistos["gen"].dict_histosKin["all"].multi.Fill(multi)
+                    if pdgId == 13: self.muHistos["gen"].dict_histosKin["all"].multi.Fill(multi)
+                    if pdgId == 15: self.tauHistos["gen"].dict_histosKin["all"].multi.Fill(multi)
 
             # Fill Histograms - Reco Level
             ##################################################################################
             # Loop over electrons
-            for lvl in selLevels:
-                self.elHistos["reco"].dict_histosKin[lvl].multi.Fill(len(selectedEls[lvl])) # Multiplicity
-                for el in selectedEls[lvl]:
-                    self.elHistos["reco"].dict_histosKin[lvl].charge.Fill(el.charge)
-                    self.elHistos["reco"].dict_histosKin[lvl].energy.Fill(el.E())
-                    self.elHistos["reco"].dict_histosKin[lvl].eta.Fill(el.eta())
+            for selLvl in selLevels:
+                self.elHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedEls[selLvl])) # Multiplicity
+                for el in selectedEls[selLvl]:
+                    fillKinematicHistos(el, self.elHistos["reco"].dict_histosKin[selLvl])
             
             # Loop over muons
-            for lvl in selLevels:
-                self.muHistos["reco"].dict_histosKin[lvl].multi.Fill(len(selectedMuons[lvl])) # Multiplicity
-                for muon in selectedMuons[lvl]:
+            for selLvl in selLevels:
+                self.muHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedMuons[selLvl])) # Multiplicity
+                for muon in selectedMuons[selLvl]:
                     # Fill Kinematic Histos
-                    self.muHistos["reco"].dict_histosKin[lvl].charge.Fill(muon.charge)
-                    self.muHistos["reco"].dict_histosKin[lvl].energy.Fill(muon.E())
-                    self.muHistos["reco"].dict_histosKin[lvl].eta.Fill(muon.eta())
-                    self.muHistos["reco"].dict_histosKin[lvl].pt.Fill(muon.pt())
-                    self.muHistos["reco"].dict_histosKin[lvl].pz.Fill(muon.pz())
+                    fillKinematicHistos(muon, self.muHistos["reco"].dict_histosKin[selLvl])
                   
                     # Fill Id Histos
                     for binX,idLabel in enumerate(muonIdLabels):
                         if getattr(muon, idLabel) > 0:
-                            self.muHistos["reco"].dict_histosId[lvl].idLabel.Fill(binX+1)
+                            self.muHistos["reco"].dict_histosId[selLvl].idLabel.Fill(binX+1)
                             
                             for binY,hitLabel in enumerate(muonhitLabels):
-                                self.muHistos["reco"].dict_histosId[lvl].dict_hitHistos[idLabel].Fill( getattr(muon, hitLabel), binY+1 )
+                                self.muHistos["reco"].dict_histosId[selLvl].dict_hitHistos[idLabel].Fill( getattr(muon, hitLabel), binY+1 )
 
-                    self.muHistos["reco"].dict_histosId[lvl].dxy.Fill(muon.dxy)
-                    self.muHistos["reco"].dict_histosId[lvl].dz.Fill(muon.dz)
-                    self.muHistos["reco"].dict_histosId[lvl].normChi2.Fill(muon.normChi2)
+                    self.muHistos["reco"].dict_histosId[selLvl].dxy.Fill(muon.dxy)
+                    self.muHistos["reco"].dict_histosId[selLvl].dz.Fill(muon.dz)
+                    self.muHistos["reco"].dict_histosId[selLvl].normChi2.Fill(muon.normChi2)
                     
                     # Fill Iso Histos
-                    self.muHistos["reco"].dict_histosIso[lvl].isoTrackerBased03.Fill(muon.isoTrackerBased03)
+                    self.muHistos["reco"].dict_histosIso[selLvl].isoTrackerBased03.Fill(muon.isoTrackerBased03)
 
             # Loop over taus
-            for lvl in selLevels:
-                self.tauHistos["reco"].dict_histosKin[lvl].multi.Fill(len(selectedTaus[lvl])) # Multiplicity
-                for tau in selectedTaus[lvl]:
-                    self.tauHistos["reco"].dict_histosKin[lvl].charge.Fill(tau.charge)
-                    self.tauHistos["reco"].dict_histosKin[lvl].energy.Fill(tau.E())
-                    self.tauHistos["reco"].dict_histosKin[lvl].eta.Fill(tau.eta())
-                    self.tauHistos["reco"].dict_histosKin[lvl].mass.Fill(tau.M())
-                    self.tauHistos["reco"].dict_histosKin[lvl].pt.Fill(tau.pt())
+            for selLvl in selLevels:
+                self.tauHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedTaus[selLvl])) # Multiplicity
+                for tau in selectedTaus[selLvl]:
+                    fillKinematicHistos(tau, self.tauHistos["reco"].dict_histosKin[selLvl])
             
                     # Fill Id Histos
-                    self.tauHistos["reco"].dict_histosId[lvl].dxy.Fill(tau.dxy)
-                    self.tauHistos["reco"].dict_histosId[lvl].againstElVLooseMVA6.Fill(tau.againstElectronVLooseMVA6)
-                    self.tauHistos["reco"].dict_histosId[lvl].againstMuonTight3.Fill(tau.againstMuonTight3)
-                    self.tauHistos["reco"].dict_histosId[lvl].decayModeFinding.Fill(tau.decayModeFinding)
+                    self.tauHistos["reco"].dict_histosId[selLvl].dxy.Fill(tau.dxy)
+                    self.tauHistos["reco"].dict_histosId[selLvl].againstElVLooseMVA6.Fill(tau.againstElectronVLooseMVA6)
+                    self.tauHistos["reco"].dict_histosId[selLvl].againstMuonTight3.Fill(tau.againstMuonTight3)
+                    self.tauHistos["reco"].dict_histosId[selLvl].decayModeFinding.Fill(tau.decayModeFinding)
 
                     # Fill Iso Histos
-                    self.tauHistos["reco"].dict_histosIso[lvl].tightIsoMVArun2v1DBoldDMwLT.Fill(tau.byTightIsolationMVArun2v1DBoldDMwLT)
+                    self.tauHistos["reco"].dict_histosIso[selLvl].tightIsoMVArun2v1DBoldDMwLT.Fill(tau.byTightIsolationMVArun2v1DBoldDMwLT)
 
             ##################################################################################
             ##################################################################################
@@ -336,11 +325,7 @@ class lfvAnalyzer:
             hvyResCand.charge = candTuple[0].charge + candTuple[1].charge
             
             # Fill Reco level histos for hvy reso candidate - Kinematics
-            self.hvyResHistos["reco"].dict_histosKin[selLevels[-1]].charge.Fill(hvyResCand.charge)
-            self.hvyResHistos["reco"].dict_histosKin[selLevels[-1]].energy.Fill(hvyResCand.E())
-            self.hvyResHistos["reco"].dict_histosKin[selLevels[-1]].eta.Fill(hvyResCand.eta())
-            self.hvyResHistos["reco"].dict_histosKin[selLevels[-1]].mass.Fill(hvyResCand.M())
-            self.hvyResHistos["reco"].dict_histosKin[selLevels[-1]].pt.Fill(hvyResCand.pt())
+            fillKinematicHistos(hvyResCand, self.hvyResHistos["reco"].dict_histosKin[selLevels[-1]])
 
             if not self.isData and self.anaGen:
                 candTupleGen = (selectedGenParts[self.sigPdgId1][0], selectedGenParts[self.sigPdgId2][0])
@@ -349,87 +334,86 @@ class lfvAnalyzer:
                 hvyResCandGen.charge = candTupleGen[0].charge + candTupleGen[1].charge
                 
                 # Fill Reco level histos for hvy res candidate - Kinematics
-                self.hvyResHistos["gen"].dict_histosKin[selLevels[-1]].charge.Fill(hvyResCandGen.charge)
-                self.hvyResHistos["gen"].dict_histosKin[selLevels[-1]].energy.Fill(hvyResCandGen.E())
-                self.hvyResHistos["gen"].dict_histosKin[selLevels[-1]].eta.Fill(hvyResCandGen.eta())
-                self.hvyResHistos["gen"].dict_histosKin[selLevels[-1]].mass.Fill(hvyResCandGen.M())
-                self.hvyResHistos["gen"].dict_histosKin[selLevels[-1]].pt.Fill(hvyResCandGen.pt())
+                fillKinematicHistos(hvyResCandGen, self.hvyResHistos["gen"].dict_histosKin[selLevels[-1]])
 
                 # Fill Mass Resolution Histograms for hvy res candidate
                 self.hvyResHistos["reco"].dict_histosResol[selLevels[-1]].mass_response.Fill(hvyResCandGen.M(),hvyResCand.M())
                 self.hvyResHistos["reco"].dict_histosResol[selLevels[-1]].massResol.Fill( (hvyResCand.M() - hvyResCandGen.M() ) / hvyResCandGen.M() )
 
-               # print "reco info:"
-               # print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
-               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-               #         candTuple[0].pdgId, 
-               #         candTuple[0].status, 
-               #         candTuple[0].charge, 
-               #         candTuple[0].px(), 
-               #         candTuple[0].py(), 
-               #         candTuple[0].pz(), 
-               #         candTuple[0].E(), 
-               #         candTuple[0].pt(), 
-               #         candTuple[0].eta(), 
-               #         candTuple[0].M() )
-               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-               #         candTuple[1].pdgId, 
-               #         candTuple[1].status, 
-               #         candTuple[1].charge, 
-               #         candTuple[1].px(), 
-               #         candTuple[1].py(), 
-               #         candTuple[1].pz(), 
-               #         candTuple[1].E(), 
-               #         candTuple[1].pt(), 
-               #         candTuple[1].eta(), 
-               #         candTuple[1].M() )
-               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-               #         hvyResCand.pdgId, 
-               #         hvyResCand.status, 
-               #         hvyResCand.charge, 
-               #         hvyResCand.px(), 
-               #         hvyResCand.py(), 
-               #         hvyResCand.pz(), 
-               #         hvyResCand.E(), 
-               #         hvyResCand.pt(), 
-               #         hvyResCand.eta(), 
-               #         hvyResCand.M() )
+                if printHvyResInfo:
+                    print "reco info:"
+                    print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
+                    print "| :---: | :----: | :----: | -- | -- | -- | - | -- | :-: | :--: |"
+                    print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+                            candTuple[0].pdgId, 
+                            candTuple[0].status, 
+                            candTuple[0].charge, 
+                            candTuple[0].px(), 
+                            candTuple[0].py(), 
+                            candTuple[0].pz(), 
+                            candTuple[0].E(), 
+                            candTuple[0].pt(), 
+                            candTuple[0].eta(), 
+                            candTuple[0].M() )
+                    print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+                            candTuple[1].pdgId, 
+                            candTuple[1].status, 
+                            candTuple[1].charge, 
+                            candTuple[1].px(), 
+                            candTuple[1].py(), 
+                            candTuple[1].pz(), 
+                            candTuple[1].E(), 
+                            candTuple[1].pt(), 
+                            candTuple[1].eta(), 
+                            candTuple[1].M() )
+                    print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+                            hvyResCand.pdgId, 
+                            hvyResCand.status, 
+                            hvyResCand.charge, 
+                            hvyResCand.px(), 
+                            hvyResCand.py(), 
+                            hvyResCand.pz(), 
+                            hvyResCand.E(), 
+                            hvyResCand.pt(), 
+                            hvyResCand.eta(), 
+                            hvyResCand.M() )
 
-               # print "gen info:"
-               # print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
-               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-               #         candTupleGen[0].pdgId, 
-               #         candTupleGen[0].status, 
-               #         candTupleGen[0].charge, 
-               #         candTupleGen[0].px(), 
-               #         candTupleGen[0].py(), 
-               #         candTupleGen[0].pz(), 
-               #         candTupleGen[0].E(), 
-               #         candTupleGen[0].pt(), 
-               #         candTupleGen[0].eta(), 
-               #         candTupleGen[0].M() )
-               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-               #         candTupleGen[1].pdgId, 
-               #         candTupleGen[1].status, 
-               #         candTupleGen[1].charge, 
-               #         candTupleGen[1].px(), 
-               #         candTupleGen[1].py(), 
-               #         candTupleGen[1].pz(), 
-               #         candTupleGen[1].E(), 
-               #         candTupleGen[1].pt(), 
-               #         candTupleGen[1].eta(), 
-               #         candTupleGen[1].M() )
-               # print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
-               #         hvyResCandGen.pdgId, 
-               #         hvyResCandGen.status, 
-               #         hvyResCandGen.charge, 
-               #         hvyResCandGen.px(), 
-               #         hvyResCandGen.py(), 
-               #         hvyResCandGen.pz(), 
-               #         hvyResCandGen.E(), 
-               #         hvyResCandGen.pt(), 
-               #         hvyResCandGen.eta(), 
-               #         hvyResCandGen.M() )
+                    print "gen info:"
+                    print "| pdgId | status | charge | px | py | pz | E | pt | eta | mass |"
+                    print "| :---: | :----: | :----: | -- | -- | -- | - | -- | :-: | :--: |"
+                    print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+                            candTupleGen[0].pdgId, 
+                            candTupleGen[0].status, 
+                            candTupleGen[0].charge, 
+                            candTupleGen[0].px(), 
+                            candTupleGen[0].py(), 
+                            candTupleGen[0].pz(), 
+                            candTupleGen[0].E(), 
+                            candTupleGen[0].pt(), 
+                            candTupleGen[0].eta(), 
+                            candTupleGen[0].M() )
+                    print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+                            candTupleGen[1].pdgId, 
+                            candTupleGen[1].status, 
+                            candTupleGen[1].charge, 
+                            candTupleGen[1].px(), 
+                            candTupleGen[1].py(), 
+                            candTupleGen[1].pz(), 
+                            candTupleGen[1].E(), 
+                            candTupleGen[1].pt(), 
+                            candTupleGen[1].eta(), 
+                            candTupleGen[1].M() )
+                    print "| %i | %i | %i | %f | %f | %f | %f | %f | %f | %f |"%(
+                            hvyResCandGen.pdgId, 
+                            hvyResCandGen.status, 
+                            hvyResCandGen.charge, 
+                            hvyResCandGen.px(), 
+                            hvyResCandGen.py(), 
+                            hvyResCandGen.pz(), 
+                            hvyResCandGen.E(), 
+                            hvyResCandGen.pt(), 
+                            hvyResCandGen.eta(), 
+                            hvyResCandGen.M() )
         
         return
 
