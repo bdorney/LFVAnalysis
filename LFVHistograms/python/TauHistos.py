@@ -1,5 +1,6 @@
 import ROOT as r
 from LFVAnalysis.LFVHistograms.PhysObjHistos import *
+from LFVAnalysis.LFVHistograms.identificationHistos import identificationHistos
 from LFVAnalysis.LFVUtilities.utilities import selLevels
 
 tauIdLabels = [
