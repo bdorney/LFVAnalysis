@@ -150,23 +150,9 @@ def getSelectedMuons(event, selDict, numMuons, delim="-", listOfBranchNames=None
                 
                 # track fit info
                 thisMuon.normChi2 = event.mu_gt_normalizedChi2[idx]
+                pass
 
-            
             # Store Other Properties
-
-            # Try getting muon type using boost python (doesn't work...), curse you std::vector<bool>
-            #import pluginvectorBoolParser # From LFVUtilities/plugins
-            #boolParser = pluginvectorBoolParser.parseVectorBool()
-            #thisMuon.isGlobal     = boolParser.parse(event.mu_isGlobalMuon, idx)
-            #thisMuon.isHighPt     = boolParser.parse(event.mu_isHighPtMuon, idx)
-            #thisMuon.isLoose      = boolParser.parse(event.mu_isLooseMuon, idx)
-            #thisMuon.isMedium     = boolParser.parse(event.mu_isMediumMuon, idx)
-            #thisMuon.isPF         = boolParser.parse(event.mu_isPFMuon, idx)
-            #thisMuon.isSoft       = boolParser.parse(event.mu_isSoftMuon, idx)
-            #thisMuon.isStandAlone = boolParser.parse(event.mu_isStandAloneMuon, idx)
-            #thisMuon.isTight      = boolParser.parse(event.mu_isTightMuon, idx)
-            #thisMuon.isTracker    = boolParser.parse(event.mu_isTrackerMuon, idx)
-
             # Try getting muon type using ROOT macro, curse you std::vector<bool>
             #cmssw_base = os.getenv("CMSSW_BASE")
             #r.gROOT.LoadMacro('%s/src/LFVAnalysis/LFVUtilities/include/getValFromVectorBool.h+'%cmssw_base)
