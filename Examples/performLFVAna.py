@@ -24,36 +24,33 @@ if __name__ == '__main__':
             help="PdgId of the first daughter of the heavy resonance candidate", metavar="sigPdgId1")
     parser.add_option("--sigPdgId2", type="int", dest="sigPdgId2", default=15,
             help="PdgId of the second daughter of the heavy resonance candidate", metavar="sigPdgId2")
-    parser.add_option("-t","--triggers",action="append", dest="listOfTriggers", default=["trig_HLT_Mu50_accept","trig_HLT_TkMu50_accept"],
-            help="List of triggers to be used", metavar="listOfTriggers")
+    parser.add_option("-t","--triggers",type="string", dest="triggers", default="trig_HLT_Mu50_accept,trig_HLT_TkMu50_accept",
+            help="List of triggers to be used", metavar="triggers")
     parser.set_defaults(
             isData=False,
             printGen=False,
             printTrig=False
             )
     (options, args) = parser.parse_args()
-
-    import os
-    cmssw_base = os.getenv("CMSSW_BASE")
-    #inFile = "%s/test/RPV_MuTau_M_1800_LLE_LQD_Tree.root"%cmssw_base
-    #inFile = "/pnfs/iihe/cms/store/user/dbeghin/RPVresonantToMuTau_M-1000_LLE_LQD-001_TuneCUETP8M1_13TeV-calchep-pythia8/crab_RPVresonantToMuTau_M-1000_LLE_LQD-001/170410_133802/0000/outfile_1.root"
-    
+   
+    # Check input file
     if options.inFile is None:
         print "no input file specified, exiting"
         exit(os.EX_USAGE)
 
+    # Form list of triggers
+    listOfTriggers = options.triggers.split(",")
+
+    # Load macros
+    import os
     import ROOT as r
+    cmssw_base = os.getenv("CMSSW_BASE")
     r.gROOT.LoadMacro('%s/src/LFVAnalysis/LFVUtilities/include/getValFromVectorBool.h+'%cmssw_base)
     
     if options.debug:
         print "Input File:", options.inFile
-        print "List of Triggers:", options.listOfTriggers
+        print "List of Triggers:", listOfTriggers
      
-    #listOfTriggers = [
-    #            "trig_HLT_Mu50_accept",
-    #            "trig_HLT_TkMu50_accept"
-    #        ]
-
     from LFVAnalysis.LFVAnalyzers.lfvAnalyzer import lfvAnalyzer
     lfvAna = lfvAnalyzer(options.inFile)
     lfvAna.setAnalysisFlags(
@@ -65,7 +62,7 @@ if __name__ == '__main__':
     # analyze
     lfvAna.analyze(
             printLvl=options.printLvl, 
-            listOfTriggers=options.listOfTriggers, 
+            listOfTriggers=listOfTriggers, 
             numEvts=options.numEvts, 
             printGenList=options.printGen,
             printTrigInfo=options.printTrig)

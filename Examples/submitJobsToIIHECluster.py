@@ -18,8 +18,8 @@ if __name__ == '__main__':
             help="PdgId of the first daughter of the heavy resonance candidate", metavar="sigPdgId1")
     parser.add_option("--sigPdgId2", type="int", dest="sigPdgId2", default=15,
             help="PdgId of the second daughter of the heavy resonance candidate", metavar="sigPdgId2")
-    parser.add_option("-t","--triggers",action="append", dest="listOfTriggers", default=["trig_HLT_Mu50_accept","trig_HLT_TkMu50_accept"],
-            help="List of triggers to be used", metavar="listOfTriggers")
+    parser.add_option("-t","--triggers",type="string", dest="triggers", default="trig_HLT_Mu50_accept,trig_HLT_TkMu50_accept",
+            help="List of triggers to be used", metavar="triggers")
 
     (options, args) = parser.parse_args()
 
@@ -102,8 +102,7 @@ if __name__ == '__main__':
                 outFileName, 
                 options.sigPdgId1, 
                 options.sigPdgId2)
-        for trig in options.listOfTriggers:
-            pythonCmd += ' -t%s'%(trig)
+        pythonCmd += ' -t%s'%(options.triggers)
         if options.debug:
             pythonCmd += ' --debug'
             print pythonCmd
