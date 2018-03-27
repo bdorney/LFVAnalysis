@@ -43,7 +43,7 @@ class HvyResHistos(PhysObjHistos):
        
         # Setup Histograms
         self.dict_histosResol= {} #Resolution Histos
-        if mcType is "reco":
+        if mcType == "reco":
             for lvl in selLevels:
                 self.dict_histosResol[lvl] = HvyResMassResolHistos(self.physObjType, lvl)
 
@@ -65,7 +65,7 @@ class HvyResHistos(PhysObjHistos):
             outDirPhysObj.mkdir(lvl)
             dirSelLevel = outDirPhysObj.GetDirectory(lvl)
             
-            if self.mcType is "reco":
+            if self.mcType == "reco":
                 dirSelLevel.mkdir("MassResolution")
                 dirMassRes = dirSelLevel.GetDirectory("MassResolution")
                 self.dict_histosResol[lvl].write(dirMassRes)
