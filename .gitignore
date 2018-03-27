@@ -19,5 +19,8 @@
 !*.h
 !*.cpp
 
+# Don't ignore shell
+!*.sh
+
 # Don't ignore xml's (e.g. Build Files)
 !*.xml
