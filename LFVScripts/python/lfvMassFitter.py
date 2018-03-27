@@ -5,7 +5,7 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option("-i","--infilename", type="string", dest="inFile", default=None,
             help="input file containing TFiles files containing TTrees to be analyzed, one file per line", metavar="inFile")
-    parser.add_option("-o","--outfilename", type="string", dest="outFile", default-"lvfMassFitterOutput.root",
+    parser.add_option("-o","--outfilename", type="string", dest="outFile", default="lvfMassFitterOutput.root",
             help="output file name containing fit results", metavar="outFile")
     (options, args) = parser.parse_args()
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         dict_massResolHistos[array_fitRes[idx]['mass']].SetName(
                 "%s_m%i"%(
                     dict_massResolHistos[array_fitRes[idx]['mass']].GetName(),
-                    int(mass[0])
+                    int(array_fitRes[idx]['mass'])
                     )
                 )
 
@@ -102,6 +102,7 @@ if __name__ == '__main__':
         dict_massFits[array_fitRes[idx]['mass']].SetParameter(3, dict_massResolHistos[array_fitRes[idx]['mass']].GetMean(11))
 
         # Perform the fit
+        print "Fitting mass point: %f"%(array_fitRes[idx]['mass'])
         fitResult = dict_massResolHistos[array_fitRes[idx]['mass']].Fit(dict_massFits[array_fitRes[idx]['mass']],"SQ")
         fitValid = fitResult.IsValid()
         if not fitValid:
@@ -130,28 +131,30 @@ if __name__ == '__main__':
         pass
 
     # Make Summary Plot Directory
+    print "Fitting Finished, Storing Summary Output"
     outFile.mkdir("Summary")
     dirSummary = outFile.GetDirectory("Summary")
     dirSummary.cd()
 
-    # Mass Resolution
-    gMassRes = r.TGraphErrors(
-            len(runList),
-            array_fitRes['mass'],
-            array_fitRes['mean'],
-            array_fitRes['mass_err'],
-            array_fitRes['sigma']
-            )
+    gMassRes = r.TGraphErrors(len(runList))
+    gNormChi2 = r.TGraphErrors(len(runList))
+    
     gMassRes.SetName("g_resol_vs_mass")
-    gMassRes.Write()
-
-    # Normalized Chi2
-    gNormChi2 = r.TGraphErrors(
-            len(runList),
-            array_fitRes['mass'],
-            array_fitRes['normChi2'],
-            array_fitRes['mass_err'],
-            np.zeros(len(runList))
-            )
     gNormChi2.SetName("g_normChi2_vs_mass")
+    
+    for idx, run in enumerate(runList):
+        gMassRes.SetPoint(idx, array_fitRes[idx]['mass'], array_fitRes[idx]['mean'])
+        gMassRes.SetPointError(idx, array_fitRes[idx]['mass_err'], array_fitRes[idx]['sigma'])
+        
+        gNormChi2.SetPoint(idx, array_fitRes[idx]['mass'], array_fitRes[idx]['normChi2'])
+        gNormChi2.SetPointError(idx, array_fitRes[idx]['mass_err'], 0.)
+        
+        pass
+    
+    gMassRes.Write()
     gNormChi2.Write()
+
+    # Close Output File
+    outFile.Close()
+
+    print "Completed"
