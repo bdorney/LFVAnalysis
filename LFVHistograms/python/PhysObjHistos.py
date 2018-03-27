@@ -4,14 +4,17 @@ from LFVAnalysis.LFVHistograms.isolationHistos import *
 from LFVAnalysis.LFVUtilities.utilities import selLevels
 
 class PhysObjHistos:
-    def __init__(self, pdgId, name=None, mcType=None):
+    def __init__(self, pdgId, name=None, mcType=None, specificSelLvl=None):
         """
         pdgId - particle data group MC id for a particle (e.g. 13 for muon)
         name - Only used for complex objects (e.g. Jets) which don't have a pdgId
         mcType - string specifying Monte Carlo data tier, e.g. gen or reco
+        specificSelLvl - Optional, make histograms for only a specific element of
+                         selLevels. If not provided all are made
         """
 
         self.mcType = mcType
+        self.selLvl = specificSelLvl
 
         # Determine particle name
         dict_pdgId = {
@@ -31,8 +34,11 @@ class PhysObjHistos:
         # Setup histograms
         self.dict_histosKin = {}
         
-        for lvl in selLevels:
-            self.dict_histosKin[lvl] = kinematicHistos(self.physObjType, lvl, mcType)
+        if self.selLvl is None:
+            for lvl in selLevels:
+                self.dict_histosKin[lvl] = kinematicHistos(self.physObjType, lvl, mcType)
+        else:
+            self.dict_histosKin[self.selLvl] = kinematicHistos(self.physObjType, self.selLvl, mcType)
 
         return
 
@@ -47,6 +53,10 @@ class PhysObjHistos:
         outDirPhysObj = outFile.GetDirectory(self.physObjType)
 
         for lvl in selLevels:
+            # Should we be doing this for only a specific level?
+            if self.selLvl is not None:
+                if lvl != self.selLvl: continue 
+
             outDirPhysObj.mkdir(lvl)
             dirSelLevel = outDirPhysObj.GetDirectory(lvl)
             

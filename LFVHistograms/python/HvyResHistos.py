@@ -15,7 +15,7 @@ class HvyResDaughterHistos:
 
         self.dR = r.TH1F("%s_%s_dR_%s"%(prefix,physObj,selLevel),
                          "Reco Level %s dR(dau1,dau2) - %s"%(physObj,selLevel),
-                         110,-0.05,3.05)
+                         102,-0.05,5.05)
 
         return
 
@@ -65,18 +65,16 @@ class HvyResHistos(PhysObjHistos):
         mcType - string specifying Monte Carlo data tier, e.g. gen or reco
         """
 
-        PhysObjHistos.__init__(self,-1,name,mcType)
+        PhysObjHistos.__init__(self,-1,name,mcType,selLevels[-1])
        
         # Setup Histograms
         self.dict_histosResol = {} #Resolution Histos
         if mcType == "reco":
-            for lvl in selLevels:
-                self.dict_histosResol[lvl] = HvyResMassResolHistos(self.physObjType, lvl)
+            self.dict_histosResol[selLevels[-1]] = HvyResMassResolHistos(self.physObjType, selLevels[-1])
         
         self.dict_dauHistos = {} #Daughter Histos
         if mcType == "reco":
-            for lvl in selLevels:
-                self.dict_dauHistos[mcType] = HvyResDaughterHistos(self.physObjType, lvl, mcType)
+            self.dict_dauHistos[selLevels[-1]] = HvyResDaughterHistos(self.physObjType, selLevels[-1], mcType)
 
         return
 
@@ -92,21 +90,20 @@ class HvyResHistos(PhysObjHistos):
         outFile.mkdir(self.physObjType)
         outDirPhysObj = outFile.GetDirectory(self.physObjType)
 
-        for lvl in selLevels:
-            outDirPhysObj.mkdir(lvl)
-            dirSelLevel = outDirPhysObj.GetDirectory(lvl)
-            
-            if self.mcType == "reco":
-                dirSelLevel.mkdir("MassResolution")
-                dirMassRes = dirSelLevel.GetDirectory("MassResolution")
-                self.dict_histosResol[lvl].write(dirMassRes)
+        outDirPhysObj.mkdir(selLevels[-1])
+        dirSelLevel = outDirPhysObj.GetDirectory(selLevels[-1])
+        
+        if self.mcType == "reco":
+            dirSelLevel.mkdir("MassResolution")
+            dirMassRes = dirSelLevel.GetDirectory("MassResolution")
+            self.dict_histosResol[selLevels[-1]].write(dirMassRes)
 
-            dirSelLevel.mkdir("DaughterHistos")
-            dirDauHistos = dirSelLevel.GetDirectory("DaughterHistos")
-            if self.mcType == "reco":
-                dirDauHistos.mkdir("reco")
-                dirReco = dirDauHistos.GetDirectory("reco")
-                self.dict_dauHistos[lvl].write(dirReco)
+        dirSelLevel.mkdir("DaughterHistos")
+        dirDauHistos = dirSelLevel.GetDirectory("DaughterHistos")
+        if self.mcType == "reco":
+            dirDauHistos.mkdir("reco")
+            dirReco = dirDauHistos.GetDirectory("reco")
+            self.dict_dauHistos[selLevels[-1]].write(dirReco)
 
         outFile.Close()
 
