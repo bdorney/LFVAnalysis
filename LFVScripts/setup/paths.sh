@@ -15,11 +15,11 @@ then
     return
 fi
 
-# Set python virtualenv
-source $LFV_PATH/LFVScripts/setup/createVirtualEnv.sh
-
 # Export project
 export LFV_PATH=$CMSSW_BASE/src/LFVAnalysis
+
+# Set python virtualenv
+source $LFV_PATH/LFVScripts/setup/createVirtualEnv.sh
 
 # Setup PATH
 export PATH=$PATH:$CMSSW_BASE/src/LFVAnalysis/LFVScripts/python
