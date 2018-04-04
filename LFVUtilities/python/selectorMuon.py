@@ -33,14 +33,14 @@ muonSelection["kin"]["mu_ibt_pt"] = (53, "ge")
 muonSelection["kin"]["mu_ibt_eta"] = (2.4, "fabs-le")
 
 # Kinematic & Id Selection
-muonSelection["kinId"]["mu_isHighPtMuon"] = (1,"eq")
+muonSelection["kin-id"]["mu_isHighPtMuon"] = (1,"eq")
 for bName,cutTuple in muonSelection["kin"].iteritems():
-    muonSelection["kinId"][bName] = cutTuple
+    muonSelection["kin-id"][bName] = cutTuple
 
 # Kinematic, Id & Isolation Selection
-muonSelection["kinIdIso"]["mu_isoTrackerBased03"] = (0.1, "l" )
-for bName,cutTuple in muonSelection["kinId"].iteritems():
-    muonSelection["kinIdIso"][bName] = cutTuple
+muonSelection["kin-id-iso"]["mu_isoTrackerBased03"] = (0.1, "l" )
+for bName,cutTuple in muonSelection["kin-id"].iteritems():
+    muonSelection["kin-id-iso"][bName] = cutTuple
 
 def getSelectedMuons(event, selDict, numMuons, delim="-", listOfBranchNames=None, useGlobalTrack=False, debug=False):
     """

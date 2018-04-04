@@ -24,17 +24,17 @@ tauSelection["kin"]["tau_pt"] = (30, "ge")
 tauSelection["kin"]["tau_eta"] = (2.3, "fabs-le")
 
 # Kinematic & Id Selection
-tauSelection["kinId"]["tau_decayModeFinding"] = (0.5, "ge")
-tauSelection["kinId"]["tau_againstMuonTight3"] = (0.5, "ge")
-tauSelection["kinId"]["tau_againstElectronVLooseMVA6"] = (0.5, "ge")
-tauSelection["kinId"]["tau_charge"] = (1, "fabs-eq")
+tauSelection["kin-id"]["tau_decayModeFinding"] = (0.5, "ge")
+tauSelection["kin-id"]["tau_againstMuonTight3"] = (0.5, "ge")
+tauSelection["kin-id"]["tau_againstElectronVLooseMVA6"] = (0.5, "ge")
+tauSelection["kin-id"]["tau_charge"] = (1, "fabs-eq")
 for bName,cutTuple in tauSelection["kin"].iteritems():
-    tauSelection["kinId"][bName] = cutTuple
+    tauSelection["kin-id"][bName] = cutTuple
 
 # Kinematic, Id & Isolation Selection
-tauSelection["kinIdIso"]["tau_byTightIsolationMVArun2v1DBoldDMwLT"] = (0.5, "g" )
-for bName,cutTuple in tauSelection["kinId"].iteritems():
-    tauSelection["kinIdIso"][bName] = cutTuple
+tauSelection["kin-id-iso"]["tau_byTightIsolationMVArun2v1DBoldDMwLT"] = (0.5, "g" )
+for bName,cutTuple in tauSelection["kin-id"].iteritems():
+    tauSelection["kin-id-iso"][bName] = cutTuple
 
 def getSelectedTaus(event, selDict, numTaus, delim="-", listOfBranchNames=None, debug=False):
     """
