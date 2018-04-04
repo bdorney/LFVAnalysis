@@ -4,6 +4,7 @@ from LFVAnalysis.LFVHistograms.MuonHistos import muonIdLabels, muonhitLabels, Mu
 from LFVAnalysis.LFVHistograms.PhysObjHistos import PhysObjHistos
 from LFVAnalysis.LFVHistograms.TauHistos import tauIdLabels, TauHistos
 
+from LFVAnalysis.LFVUtilities.getSelection import getSelection
 from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
 from LFVAnalysis.LFVUtilities.selectorEl import getSelectedElectrons, elSelection
 from LFVAnalysis.LFVUtilities.selectorMuon import getSelectedMuons, muonSelection 
@@ -45,6 +46,10 @@ class lfvAnalyzer:
         self.sigPdgId1 = 13                 #Particle Id of Hvy Resonance Daughter 1
         self.sigPdgId2 = 15                 #Particle Id of Hvy Resonance Daughter 2
         self.useGlobalMuonTrack = False     #If True (False) use Global (IBT) muon track
+
+        self.elSel  = elSelection            # Selection Dict - Electrons
+        self.muonSel= muonSelection          # Selection Dict - Muons
+        self.tauSel = tauSelection           # Selection Dict - Taus
 
         # Make Histograms
         self.elHistos = {}
@@ -180,17 +185,17 @@ class lfvAnalyzer:
             # Get selected electrons
             selectedEls = nesteddict()
             for selLvl in selLevels:
-                selectedEls[selLvl] = getSelectedElectrons(event, elSelection[selLvl], event.gsf_n, listOfBranchNames=listBNames)
+                selectedEls[selLvl] = getSelectedElectrons(event, self.elSel[selLvl], event.gsf_n, listOfBranchNames=listBNames)
             
             # Get selected muons
             selectedMuons = nesteddict()
             for selLvl in selLevels:
-                selectedMuons[selLvl] = getSelectedMuons(event, muonSelection[selLvl], event.mu_n, listOfBranchNames=listBNames, useGlobalTrack=self.useGlobalMuonTrack)
+                selectedMuons[selLvl] = getSelectedMuons(event, self.muonSel[selLvl], event.mu_n, listOfBranchNames=listBNames, useGlobalTrack=self.useGlobalMuonTrack)
 
             # Get selected taus
             selectedTaus = nesteddict()
             for selLvl in selLevels:
-                selectedTaus[selLvl] = getSelectedTaus(event, tauSelection[selLvl], event.tau_n, listOfBranchNames=listBNames)
+                selectedTaus[selLvl] = getSelectedTaus(event, self.tauSel[selLvl], event.tau_n, listOfBranchNames=listBNames)
 
             # Fill Histograms - Gen Level
             ##################################################################################
@@ -456,11 +461,16 @@ class lfvAnalyzer:
 
         The keyword is assumed to be the same as the variable name for simplicity
 
-        isData - perform data analysis
-        anaGen - perform the gen particle analysis, note ignored if isData is True
-        anaReco - performs the reco level analysis
-        sigPdgId1 - particle id of hvy resonance daughter 1
-        sigPdgId2 - particle id of hvy resonance daughter 2
+        anaGen              - perform the gen particle analysis, note ignored if isData is True
+        anaReco             - performs the reco level analysis
+        forceDaughterPairOS - Require hvy resonance daughter cand's to have opposite sign charge
+        isData              - perform data analysis
+        selFileEl           - Text file defining election selection, see getSelection(...)
+        selFileMuon         - As selFileEl but for muons
+        selFileTau          - As selFileEl but for taus
+        sigPdgId1           - particle id of hvy resonance daughter 1
+        sigPdgId2           - particle id of hvy resonance daughter 2
+        useGlobalMuonTrack  - use global muon track instead of ibt for muon kinematics
         """
 
         if "anaGen" in kwargs:
@@ -473,6 +483,12 @@ class lfvAnalyzer:
             self.isData = kwargs["isData"]
         if "minDaughterPairdR" in kwargs:
             self.minDaughterPairdR = kwargs["minDaughterPairdR"] 
+        if "selFileEl" in kwargs:
+            self.elSel = getSelection(kwargs["selFileEl"])
+        if "selFileMuon" in kwargs:
+            self.muonSel = getSelection(kwargs["selFileMuon"])
+        if "selFileTau" in kwargs:
+            self.tauSel = getSelection(kwargs["selFileTau"])
         if "sigPdgId1" in kwargs:
             self.sigPdgId1 = kwargs["sigPdgId1"]
         if "sigPdgId2" in kwargs:
