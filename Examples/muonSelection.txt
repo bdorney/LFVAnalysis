@@ -1,0 +1,7 @@
+| selLvl | parentLvl | branchName | Value | Operator |
+| :----: | :-------: | :--------: | :---: | :------: |
+| all | None | mu_ibt_pt | 0 | ge |
+| kin | all | mu_ibt_pt | 53 | ge |
+| kin | all | mu_ibt_eta | 2.4 | fabs-le |
+| kin-id | kin | mu_isHighPtMuon | 1 | eq |
+| kin-id-iso | kin-id | mu_isoTrackerBased03 | 0.1 | l |
