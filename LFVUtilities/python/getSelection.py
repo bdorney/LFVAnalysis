@@ -112,4 +112,12 @@ def getSelection(filename_Sel):
         file_Sel.close()
         pass
 
+    # Fill additional sel levels if they are not present using the last filled lvl
+    for lvl in selLevels:
+        if lvl not in ret_sel.keys():
+            lastLvl = (ret_sel.keys())[-1]
+            
+            for bName,cutTuple in ret_sel[lastLvl].iteritems():
+                ret_sel[lvl][bName] = cutTuple
+
     return ret_sel
