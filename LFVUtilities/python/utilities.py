@@ -4,8 +4,8 @@ import os
 selLevels = (
         "all",
         "kin",
-        "kinId",
-        "kinIdIso"
+        "kin-id",
+        "kin-id-iso"
         )
 
 # Monte Carlo Levels
