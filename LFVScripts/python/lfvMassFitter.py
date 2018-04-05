@@ -63,6 +63,10 @@ if __name__ == '__main__':
     # Loop over runs and fit a histogram for each of them
     from LFVAnalysis.LFVUtilities.utilities import selLevels
     for idx,run in enumerate(runList):
+        # Skip commented lines
+        if run[0] == "#":
+            continue
+        
         # open the ROOT File
         try:
             dataFile = r.TFile(run,"READ")
