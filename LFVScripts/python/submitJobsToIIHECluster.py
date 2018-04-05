@@ -32,6 +32,9 @@ if __name__ == '__main__':
     setupCmds_JobPath = ["mkdir","-p", jobPath ]
     runCommand(setupCmds_JobPath)
 
+    setupCmds_Link = ['ln','-sf',jobPath,'current'] #make a link for the most recent one
+    runCommand(setupCmds_Link)
+
     outPath = "%s/rootfiles"%jobPath
     setupCmds_out = ["mkdir","-p", outPath ]
     runCommand(setupCmds_out)
