@@ -24,6 +24,46 @@ supOperators = (
         "le"    #less than or equal too
         )
 
+# Supported Observable Types
+supObservables = {
+        "DaughterHistos":[
+            "dR"
+            ],
+        "Kinematics":[
+            "charge",
+            "energy",
+            "eta",
+            "mass",
+            "multi",
+            "pt",
+            "pz"
+            ],
+        "Identification":[
+            "againstElVLooseMVA6",
+            "againstMuonTight3",
+            "decayModeFinding",
+            "dxy",
+            "dz",
+            "idLabel",
+            "normChi2",
+            ],
+        "Isolation":[
+            "isoTrkBased03",
+            "tightIsoMVArun2v1DBoldBMwLT"
+            ],
+        "MassResolution":[
+            "massResol"
+            ]
+        }
+
+# Supported Particle Names
+supParticleNames = (
+        "el",       # electron
+        "HvyRes",   # heavy resonance candidate (e.g. RPV, QBH, Zprime, etc...)
+        "mu",       # muon
+        "tau"       # tau
+        )
+
 def dR(cand1, cand2):
     """
     Calculates the dR between cand1 and cand2
