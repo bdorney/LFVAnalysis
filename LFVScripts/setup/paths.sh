@@ -24,6 +24,12 @@ source $LFV_PATH/LFVScripts/setup/createVirtualEnv.sh
 # Setup PATH
 export PATH=$PATH:$CMSSW_BASE/src/LFVAnalysis/LFVScripts/python
 
+# Make observable files
+if [ ! -f $LFV_PATH/Examples/listOfObservables_mu.txt ]
+then
+    makeListOfObservables.py
+fi
+
 # Done
 echo JOB_PATH $JOB_PATH
 echo LFV_PATH $LFV_PATH
