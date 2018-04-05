@@ -22,3 +22,16 @@ daughterGroup.add_option("--sigPdgId1", type="int", dest="sigPdgId1", default=13
 daughterGroup.add_option("--sigPdgId2", type="int", dest="sigPdgId2", default=15,
         help="PdgId of the second daughter of the heavy resonance candidate", metavar="sigPdgId2")
 parser.add_option_group(daughterGroup)
+
+# Define the external selection group
+extSelGroup = OptionGroup(
+        parser,
+        "Physics Object Selection Options",
+        "Options which allow you to specify external files which define the selection dictionaries for given object")
+extSelGroup.add_option("--selFileEl", type="string",dest="selFileEl",default=None,
+        help="File specifying electron selection", metavar="selFileEl")
+extSelGroup.add_option("--selFileMuon", type="string",dest="selFileMuon",default=None,
+        help="File specifying muon selection", metavar="selFileMuon")
+extSelGroup.add_option("--selFileTau", type="string",dest="selFileTau",default=None,
+        help="File specifying tau selection", metavar="selFileTau")
+parser.add_option_group(extSelGroup)

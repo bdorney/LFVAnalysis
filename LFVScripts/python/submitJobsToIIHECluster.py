@@ -101,6 +101,12 @@ if __name__ == '__main__':
         if options.debug:
             pythonCmd += ' --debug'
             print pythonCmd
+        if options.selFileEl is not None:
+            pythonCmd += ' --selFileEl=%s'%(options.selFileEl)
+        if options.selFileMuon is not None:
+            pythonCmd += ' --selFileMuon=%s'%(options.selFileMuon)
+        if options.selFileTau is not None:
+            pythonCmd += ' --selFileTau=%s'%(options.selFileTau)
         pythonCmd += '\n'
 
         script.write(pythonCmd)

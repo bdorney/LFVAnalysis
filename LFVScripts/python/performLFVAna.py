@@ -46,6 +46,23 @@ if __name__ == '__main__':
             anaGen=(not options.isData), 
             sigPdgId1=options.sigPdgId1, 
             sigPdgId2=options.sigPdgId2)
+
+    # Externally defined selection?
+    if options.selFileEl is not None:
+        lfvAna.setAnalysisFlags(
+                selFileEl=options.selFileEl
+                )
+        pass
+    if options.selFileMuon is not None:
+        lfvAna.setAnalysisFlags(
+                selFileMuon=options.selFileMuon
+                )
+        pass
+    if options.selFileTau is not None:
+        lfvAna.setAnalysisFlags(
+                selFileTau=options.selFileTau
+                )
+        pass
     
     # analyze
     lfvAna.analyze(
