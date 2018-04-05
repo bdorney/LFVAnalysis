@@ -25,12 +25,12 @@ elSelection["kin"]["gsf_energy"] = (50, "g")
 # Kinematic & Id Selection
 #elSelection["kinId"]["mu_isGlobalMuon"] = (1,"eq")
 for bName,cutTuple in elSelection["kin"].iteritems():
-    elSelection["kinId"][bName] = cutTuple
+    elSelection["kin-id"][bName] = cutTuple
 
 # Kinematic, Id & Isolation Selection
 #elSelection["kinIdIso"]["mu_isoTrackerBased03"] = (0.1, "l" )
-for bName,cutTuple in elSelection["kinId"].iteritems():
-    elSelection["kinIdIso"][bName] = cutTuple
+for bName,cutTuple in elSelection["kin-id"].iteritems():
+    elSelection["kin-id-iso"][bName] = cutTuple
 
 def getSelectedElectrons(event, selDict, numElectrons, delim="-", listOfBranchNames=None, debug=False):
     """
