@@ -49,7 +49,7 @@ supObservables = {
             ],
         "Isolation":[
             "isoTrkBased03",
-            "tightIsoMVArun2v1DBoldBMwLT"
+            "tightIsoMVArun2v1DBoldDMwLT"
             ],
         "MassResolution":[
             "massResol"
