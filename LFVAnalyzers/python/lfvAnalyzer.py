@@ -426,7 +426,7 @@ class lfvAnalyzer:
 
                 # Fill Mass Resolution Histograms for hvy res candidate
                 self.hvyResHistos["reco"].dict_histosResol[selLevels[-1]].mass_response.Fill(hvyResCandGen.M(),hvyResCand.M())
-                self.hvyResHistos["reco"].dict_histosResol[selLevels[-1]].massResol.Fill( (hvyResCand.M() - hvyResCandGen.M() ) / hvyResCandGen.M() )
+                self.hvyResHistos["reco"].dict_histosResol[selLevels[-1]].massResol.Fill( calcObsResolution(hvyResCand.M(), hvyResCandGen.M() ) )
 
                 if printHvyResInfo:
                     print "reco info:"
