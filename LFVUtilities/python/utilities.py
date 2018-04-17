@@ -64,6 +64,13 @@ supParticleNames = (
         "tau"       # tau
         )
 
+def calcObsResolution(obsReco, obsGen):
+    """
+    Calculates the resolution for some observable
+    """
+
+    return (obsReco - obsGen) / obsGen
+
 def dR(cand1, cand2):
     """
     Calculates the dR between cand1 and cand2
@@ -76,13 +83,14 @@ def dR(cand1, cand2):
 
     return sqrt( (cand1.eta() - cand2.eta())**2 + (cand1.phi() - cand2.phi())**2 )
 
-def fillKinematicHistos(candidate, kinHistos):
+def fillKinematicHistos(candidate, kinHistos, fillGen=True):
     """
     Fills kinematic histos for an particle candidate.
     Note multiplicity histo is not filled
 
     candidate - an object inheriting from PhysObj
     kinHistos - an instance of kinematicHistos
+    fillGen   - True (False) will (not) fill histograms requiring GEN lvl info
     """
 
     kinHistos.charge.Fill(candidate.charge)
@@ -91,9 +99,65 @@ def fillKinematicHistos(candidate, kinHistos):
     kinHistos.mass.Fill(candidate.M())
     kinHistos.pt.Fill(candidate.pt())
     kinHistos.pz.Fill(candidate.pz())
+    if fillGen:
+        kinHistos.dRMatched.Fill(dR(candidate, candidate.matchedGenObj))
+        kinHistos.ptRes.Fill(calcObsResolution(candidate.pt(), candidate.matchedGenObj.pt() ) )
+        pass
 
     return
+
+def matchObjsBydR(listReco,listGen,maxdR=0.5,debug=False):    
+    """
+    Matches objects in listGen to objects in listReco by dR matching.
+    The best match will be used. A match is found if:
+
+        dR(listReco[i],listGen[j]) < maxdR
+
+    And
+        
+        dR(listReco[i],listGen[j]) is the minimum dR
+
+    Note elements of listReco and listGen are expected to inherit from
+    PhysObj of LFVObjects/python/physicsObject.py
+    """
+
+    import numpy as np
+
+    # Determine all possible dR pairings
+    listPossibleMatches = [ ] # list of tuples: (dR, idxReco, idxGen)
+    for idxReco, candReco in enumerate(listReco):
+        for idxGen, candGen in enumerate(listGen):
+            listPossibleMatches.append( (dR(candReco, candGen), idxReco, idxGen) )
+            pass
+        pass
+
+    # store the pairings in a structured numpy array
+    dataType = np.dtype('float,int,int')
+    dataType.names = ["dR","idxReco","idxGen"]
+    arrayPossibleMatches = np.array(listPossibleMatches, dataType) 
     
+    # remove entries failing the cut
+    arrayPossibleMatches = arrayPossibleMatches[ arrayPossibleMatches['dR'] < maxdR]
+
+    # sort possible matches by ascending dR
+    arrayPossibleMatches = np.sort(arrayPossibleMatches)
+
+    for matchCand in arrayPossibleMatches:
+        #print matchCand
+        if listReco[matchCand['idxReco']].isMatched: # Set when matched below
+            continue
+        elif listGen[matchCand['idxGen']].isMatched: # Set when matched below
+            continue
+        else:
+            listReco[matchCand['idxReco']].setMatchedGenObj(listGen[matchCand['idxGen']])
+            if debug:
+                print "matchObjsBydR() - match found (%f, %i, %i)"%(matchCand['dR'], matchCand['idxReco'], matchCand['idxGen'])
+                pass # end debug
+            pass # end matching
+        pass # end loop over arrayPossibleMatches
+
+    return arrayPossibleMatches
+
 def passesCut(valOfInterest, cutVal, listOfCutStrings):
     """
     Checks if valOfInterest passes cutVal uses logical operations
