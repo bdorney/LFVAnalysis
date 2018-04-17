@@ -3,10 +3,22 @@ from LFVAnalysis.LFVHistograms.PhysObjHistos import *
 from LFVAnalysis.LFVHistograms.identificationHistos import identificationHistos
 from LFVAnalysis.LFVUtilities.utilities import selLevels
 
-tauIdLabels = [
-        "isPF"
-        ]
-tauIdLabels = sorted( tauIdLabels, key=str.lower) #alphabitize this just in case (it might grow)
+tauDecayLabels = {
+        0:"1 prong + 0 pi0",
+        1:"1 prong + 1pi0",
+        2:"1 prong + 2pi0s",
+        5:"2 prongs + 0pi0",
+        6:"2 prongs + 1 pi0s",
+        7:"2 prongs + 2 pi0s",
+        10:"3 prongs + 0 pi0s",
+        11:"3 prongs + 1 pi0"
+        }
+
+#tauIdLabels = [
+#        "isPF"
+#        ]
+#tauIdLabels = sorted( tauIdLabels, key=str.lower) #alphabitize this just in case (it might grow)
+tauIdLabels = tauDecayLabels.values()
 
 class TauIdHistos(identificationHistos):
     def __init__(self, physObj="mu", selLevel="all", mcType=None):
@@ -22,14 +34,24 @@ class TauIdHistos(identificationHistos):
         if mcType is not None:
             prefix = "h_%s"%mcType
 
+        # 1D Histograms
         self.decayModeFinding = r.TH1F("%s_%s_decayModeFinding_%s"%(prefix,physObj,selLevel),
                                        "%s decayModeFinding - %s"%(physObj, selLevel),
+                                       105,-1.05,1.05)
+        self.decayModeFindingNewDMs = r.TH1F("%s_%s_decayModeFindingNewDMs_%s"%(prefix,physObj,selLevel),
+                                       "%s decayModeFindingNewDMs - %s"%(physObj, selLevel),
                                        105,-1.05,1.05)
         self.againstMuonTight3 = r.TH1F("%s_%s_againstMuonTight3_%s"%(prefix,physObj,selLevel),
                                        "%s againstMuonTight3 - %s"%(physObj, selLevel),
                                        105,-1.05,1.05)
         self.againstElVLooseMVA6 = r.TH1F("%s_%s_againstElVLooseMVA6_%s"%(prefix,physObj,selLevel),
                                        "%s againstElVLooseMVA6 - %s"%(physObj, selLevel),
+                                       105,-1.05,1.05)
+
+        # 2D Histograms
+        self.decayModeFinding_NewVsOld = r.TH2F("%s_%s_self.decayModeFinding_NewVsOld_%s"%(prefix,physObj,selLevel),
+                                       "%s decayModeFindingNewDMs vs. decayModeFindingOld - %s"%(physObj, selLevel),
+                                       105,-1.05,1.05,
                                        105,-1.05,1.05)
 
         return
@@ -43,8 +65,10 @@ class TauIdHistos(identificationHistos):
 
         directory.cd()
         self.decayModeFinding.Write()
+        self.decayModeFindingNewDMs.Write()
         self.againstMuonTight3.Write()
         self.againstElVLooseMVA6.Write()
+        self.self.decayModeFinding_NewVsOld.Write()
 
         return
 
