@@ -15,16 +15,16 @@ if __name__ == '__main__':
     requiredArgsGroup.add_option("--obsverableFile", type="string", dest="obsFile", default=None,
             help="Comma separated file where each line goes as: particle name, observable type, observable name",
             metavar="obsFile")
-    requiredArgsGroup.add_option("-o","--outfilename", type="string", dest="outFile", default="PlottedObservables.root",
+    requiredArgsGroup.add_option("-o","--outfilename", type="string", dest="outFile", default=None,
             help="output file name containing fit results", metavar="outFile")
     parser.add_option_group(requiredArgsGroup)
 
     from LFVAnalysis.LFVUtilities.utilities import selLevels
-    strSelLvls = "{%s"%(selLevels[0])
+    strSelLvls = "{'%s'"%(selLevels[0])
     for idx,selLvl in enumerate(selLevels):
         if idx==0:
             continue
-        strSelLvls += ", %s"%selLvl
+        strSelLvls += ", '%s'"%selLvl
         pass
     strSelLvls += "}"
 
@@ -32,10 +32,10 @@ if __name__ == '__main__':
     controlArgsGroup = OptionGroup(
                 parser,
                 "Optional Control Arguments",
-                "Optional arguments that control plotting mode.  Three cases are possible:\n \
-                        \t1. One line in --infilename and neither --selLvlReco or --selLvlGen supplied,\n \
-                        \t2. One line in --infilename and both --selLvlReco and --selLvlGen supplied, or\n \
-                        \t3. Multiple lines in --infilename and either --selLvlReco or --selLvlGen supplied\n.",
+                "Optional arguments that control plotting mode.  Three cases are possible: "
+                "1) One line in --infilename and neither --selLvlReco or --selLvlGen supplied, or "
+                "2) One line in --infilename and both --selLvlReco and --selLvlGen supplied, or "
+                "3) Multiple lines in --infilename and either --selLvlReco or --selLvlGen supplied.",
             )
     controlArgsGroup.add_option("--selLvlGen", type="string", dest="selLvlGen", default=None,
             help="selection level to be used for gen level observables, possible values are from set %s"%(strSelLvls),
@@ -57,6 +57,7 @@ if __name__ == '__main__':
             help="For each observable create a *.png and a *.C file", metavar="saveImage")
     optionalArgsGroup.add_option("--setLogY", action="store_true", dest="setLogY",
             help="For each observable use a logarithmic y-axis", metavar="setLogY")
+    parser.add_option_group(optionalArgsGroup)
     (options, args) = parser.parse_args()
     
     import os
@@ -116,6 +117,10 @@ if __name__ == '__main__':
     ##############################################
     # Make the plots
     ##############################################
+    if options.outFile is None:
+        options.outFile = options.obsFile.strip('.txt')
+        options.outFile += ".root"
+    
     from LFVAnalysis.LFVUtilities.plotUtilities import plotObservable
     for idx,obsTuple in enumerate(listOfObsTuples):
         if idx==0:
@@ -140,5 +145,3 @@ if __name__ == '__main__':
         pass # end loop over observables
 
     print "All plots made"
-
-    return 0
