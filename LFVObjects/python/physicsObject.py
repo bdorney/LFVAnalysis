@@ -1,3 +1,5 @@
+from LFVAnalysis.LFVUtilities.utilities import dR
+
 import ROOT as r
 
 class PhysObj:
@@ -17,6 +19,22 @@ class PhysObj:
 
         # MC Status Code
         self.status = status
+        
+        # Generator level match
+        self.isMatched = False
+        self.dR = -1
+
+        return
+
+    def setMatchedGenObj(self, PhysObjGen):
+        """
+        PhysObjGen - a generator level object to be matched to this object
+        """
+
+        self.matchedGenObj = PhysObjGen
+        self.isMatched = True
+        PhysObjGen.isMatched = True
+        self.dR = dR(self, PhysObjGen)
 
         return
 
