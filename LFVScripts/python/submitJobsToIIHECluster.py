@@ -91,14 +91,14 @@ if __name__ == '__main__':
         script.write('source $CMSSW_BASE/src/LFVAnalysis/LFVScripts/setup/paths.sh\n')
         script.write('cd $nodeDir\n')
         
-        #pythonCmd = 'python %s/src/LFVAnalysis/LFVScripts/python/performLFVAna.py -i%s -o%s --sigPdgId1=%i --sigPdgId2=%i'%(
-        pythonCmd = 'performLFVAna.py -i%s -o%s --sigPdgId1=%i --sigPdgId2=%i --mindR=%f'%(
+        #pythonCmd = 'python %s/src/LFVAnalysis/LFVScripts/python/performLFVAna.py -i %s -o %s --sigPdgId1=%i --sigPdgId2=%i'%(
+        pythonCmd = 'performLFVAna.py -i %s -o %s --sigPdgId1=%i --sigPdgId2=%i --mindR=%f'%(
                 run, 
                 outFileName, 
                 options.sigPdgId1, 
                 options.sigPdgId2,
                 options.mindR)
-        pythonCmd += ' -t%s'%(options.triggers)
+        pythonCmd += ' -t %s'%(options.triggers)
         if options.oppositeSign:
             pythonCmd += ' --oppositeSign'
         if options.debug:
