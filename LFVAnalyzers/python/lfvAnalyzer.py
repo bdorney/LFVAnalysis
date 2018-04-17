@@ -2,7 +2,7 @@ from LFVAnalysis.LFVHistograms.ElHistos import elIdLabels, ElHistos
 from LFVAnalysis.LFVHistograms.HvyResHistos import HvyResHistos
 from LFVAnalysis.LFVHistograms.MuonHistos import muonIdLabels, muonhitLabels, MuonHistos
 from LFVAnalysis.LFVHistograms.PhysObjHistos import PhysObjHistos
-from LFVAnalysis.LFVHistograms.TauHistos import tauIdLabels, TauHistos
+from LFVAnalysis.LFVHistograms.TauHistos import tauDecayLabels, tauIdLabels, TauHistos
 
 from LFVAnalysis.LFVUtilities.getSelection import getSelection
 from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
@@ -10,7 +10,7 @@ from LFVAnalysis.LFVUtilities.selectorEl import getSelectedElectrons, elSelectio
 from LFVAnalysis.LFVUtilities.selectorEvent import passesEventFilters, eventSelection
 from LFVAnalysis.LFVUtilities.selectorMuon import getSelectedMuons, muonSelection 
 from LFVAnalysis.LFVUtilities.selectorTau import getSelectedTaus, tauSelection 
-from LFVAnalysis.LFVUtilities.utilities import dR, fillKinematicHistos, selLevels, mcLevels
+from LFVAnalysis.LFVUtilities.utilities import calcObsResolution, dR, fillKinematicHistos, matchObjsBydR, mcLevels, selLevels
 
 from LFVAnalysis.LFVObjects.physicsObject import *
 
@@ -193,20 +193,24 @@ class lfvAnalyzer:
 
             # Select particles - Reco Level
             ##################################################################################
-            # Get selected electrons
             selectedEls = nesteddict()
-            for selLvl in selLevels:
-                selectedEls[selLvl] = getSelectedElectrons(event, self.elSel[selLvl], event.gsf_n, listOfBranchNames=listBNames)
-            
-            # Get selected muons
             selectedMuons = nesteddict()
-            for selLvl in selLevels:
-                selectedMuons[selLvl] = getSelectedMuons(event, self.muonSel[selLvl], event.mu_n, listOfBranchNames=listBNames, useGlobalTrack=self.useGlobalMuonTrack)
-
-            # Get selected taus
             selectedTaus = nesteddict()
             for selLvl in selLevels:
+                # Get selected electrons
+                selectedEls[selLvl] = getSelectedElectrons(event, self.elSel[selLvl], event.gsf_n, listOfBranchNames=listBNames)
+                # Get selected muons
+                selectedMuons[selLvl] = getSelectedMuons(event, self.muonSel[selLvl], event.mu_n, listOfBranchNames=listBNames, useGlobalTrack=self.useGlobalMuonTrack)
+                # Get selected taus
                 selectedTaus[selLvl] = getSelectedTaus(event, self.tauSel[selLvl], event.tau_n, listOfBranchNames=listBNames)
+                # Match reco & gen level objets
+                if not self.isData and self.anaGen:
+                    dRMatchThresh = 0.5
+                    matchObjsBydR(selectedEls[selLvl], selectedGenParts[11], maxdR=dRMatchThresh, debug=False)
+                    matchObjsBydR(selectedMuons[selLvl], selectedGenParts[13], maxdR=dRMatchThresh, debug=False)
+                    matchObjsBydR(selectedTaus[selLvl], selectedGenParts[15], maxdR=dRMatchThresh, debug=True)
+                    pass # end match reco & gen level objects
+                pass # end loop over selLevels
 
             # Fill Histograms - Gen Level
             ##################################################################################
@@ -214,54 +218,76 @@ class lfvAnalyzer:
                 genMulti = nesteddict() # Container to track the multiplicity of different particle species
                 for selLvl in selLevels:
                     genMulti[selLvl] = nesteddict()
+                    pass
 
                 for pdgId,listOfParts in selectedGenParts.iteritems():
-                    for genPart in listOfParts:
-                     
+                    for genPart in listOfParts:     
                         # Determine Multiplicity
                         if abs(genPart.pdgId) in genMulti["all"].keys():
                             genMulti["all"][abs(genPart.pdgId)]+=1
                         else:
                             genMulti["all"][abs(genPart.pdgId)]=1
+                            pass
 
                         # Fill histograms: Electrons - Kinematics
                         if abs(genPart.pdgId) == 11:
                             fillKinematicHistos(genPart, self.elHistos["gen"].dict_histosKin["all"])
+                            for recoPart in selectedEls["all"]:
+                                self.elHistos["reco"].dict_histosKin["all"].dR.Fill(dR(recoPart, genPart))
+                                pass
+                            pass
 
                         # Fill histograms: Muons - Kinematics
                         if abs(genPart.pdgId) == 13:
                             fillKinematicHistos(genPart, self.muHistos["gen"].dict_histosKin["all"])
+                            for recoPart in selectedMuons["all"]:
+                                self.muHistos["reco"].dict_histosKin["all"].dR.Fill(dR(recoPart, genPart))
+                                pass
+                            pass
                         
                         # Fill histograms: Taus - Kinematics
                         if abs(genPart.pdgId) == 15:
                             fillKinematicHistos(genPart, self.tauHistos["gen"].dict_histosKin["all"])
+                            for recoPart in selectedTaus["all"]:
+                                self.tauHistos["reco"].dict_histosKin["all"].dR.Fill(dR(recoPart, genPart))
+                                pass
+                            pass
+                        pass
+                    pass # end loop over selectedGenParts.iteritems()
 
                 # Fill gen multiplicity
                 for pdgId,multi in genMulti["all"].iteritems():
                     if pdgId == 11: self.elHistos["gen"].dict_histosKin["all"].multi.Fill(multi)
                     if pdgId == 13: self.muHistos["gen"].dict_histosKin["all"].multi.Fill(multi)
                     if pdgId == 15: self.tauHistos["gen"].dict_histosKin["all"].multi.Fill(multi)
+                    pass
+                pass
 
             # Fill Histograms - Reco Level
             ##################################################################################
-            # Loop over electrons
             for selLvl in selLevels:
+                # Fill multiplicity histograms
                 self.elHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedEls[selLvl])) # Multiplicity
+                self.muHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedMuons[selLvl])) # Multiplicity
+                self.tauHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedTaus[selLvl])) # Multiplicity
+                
+                # Loop over electrons
                 for el in selectedEls[selLvl]:
                     # Fill Kinematic Histos
-                    fillKinematicHistos(el, self.elHistos["reco"].dict_histosKin[selLvl])
+                    fillKinematicHistos(el, self.elHistos["reco"].dict_histosKin[selLvl], fillGen=self.anaGen)
                     
                     # Fill Id Histos
                     for binX,idLabel in enumerate(elIdLabels):
                         if getattr(el, idLabel) > 0:
                             self.elHistos["reco"].dict_histosId[selLvl].idLabel.Fill(binX+1)
+                            pass
+                        pass
+                    pass
 
-            # Loop over muons
-            for selLvl in selLevels:
-                self.muHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedMuons[selLvl])) # Multiplicity
+                # Loop over muons
                 for muon in selectedMuons[selLvl]:
                     # Fill Kinematic Histos
-                    fillKinematicHistos(muon, self.muHistos["reco"].dict_histosKin[selLvl])
+                    fillKinematicHistos(muon, self.muHistos["reco"].dict_histosKin[selLvl], fillGen=self.anaGen)
                   
                     # Fill Id Histos
                     for binX,idLabel in enumerate(muonIdLabels):
@@ -270,6 +296,9 @@ class lfvAnalyzer:
                             
                             for binY,hitLabel in enumerate(muonhitLabels):
                                 self.muHistos["reco"].dict_histosId[selLvl].dict_hitHistos[idLabel].Fill( getattr(muon, hitLabel), binY+1 )
+                                pass
+                            pass
+                        pass
 
                     self.muHistos["reco"].dict_histosId[selLvl].dxy.Fill(muon.dxy)
                     self.muHistos["reco"].dict_histosId[selLvl].dz.Fill(muon.dz)
@@ -277,26 +306,36 @@ class lfvAnalyzer:
                     
                     # Fill Iso Histos
                     self.muHistos["reco"].dict_histosIso[selLvl].isoTrackerBased03.Fill(muon.isoTrackerBased03)
+                    pass
 
-            # Loop over taus
-            for selLvl in selLevels:
-                self.tauHistos["reco"].dict_histosKin[selLvl].multi.Fill(len(selectedTaus[selLvl])) # Multiplicity
+                # Loop over taus
                 for tau in selectedTaus[selLvl]:
                     # Fill Kinematic Histos
-                    fillKinematicHistos(tau, self.tauHistos["reco"].dict_histosKin[selLvl])
+                    fillKinematicHistos(tau, self.tauHistos["reco"].dict_histosKin[selLvl], fillGen=self.anaGen)
             
                     # Fill Id Histos
-                    for binX,idLabel in enumerate(tauIdLabels):
-                        if getattr(tau, idLabel) > 0:
-                            self.tauHistos["reco"].dict_histosId[selLvl].idLabel.Fill(binX+1)
-                    
+                    #for binX,idLabel in enumerate(tauIdLabels):
+                    #    if getattr(tau, idLabel) > 0:
+                    #        self.tauHistos["reco"].dict_histosId[selLvl].idLabel.Fill(binX+1)
+                    #        pass
+                    #    pass
+                    decayLabelIdx = tauDecayLabels.values().index( tauDecayLabels[tau.decayMode] )
+                    self.tauHistos["reco"].dict_histosId[selLvl].idLabel.Fill(decayLabelIdx+1)
+                    self.tauHistos["reco"].dict_histosId[selLvl].idLabel_vs_pt.Fill(tau.pt,decayLabelIdx+1)
+
                     self.tauHistos["reco"].dict_histosId[selLvl].dxy.Fill(tau.dxy)
                     self.tauHistos["reco"].dict_histosId[selLvl].againstElVLooseMVA6.Fill(tau.againstElectronVLooseMVA6)
                     self.tauHistos["reco"].dict_histosId[selLvl].againstMuonTight3.Fill(tau.againstMuonTight3)
                     self.tauHistos["reco"].dict_histosId[selLvl].decayModeFinding.Fill(tau.decayModeFinding)
+                    self.tauHistos["reco"].dict_histosId[selLvl].decayModeFindingNewDMs.Fill(tau.decayModeFindingNewDMs)
+                    self.tauHistos["reco"].dict_histosId[selLvl]..decayModeFinding_NewVsOld(
+                            tau.decayModeFindingNewDMs,
+                            tau.decayModeFinding)
 
                     # Fill Iso Histos
                     self.tauHistos["reco"].dict_histosIso[selLvl].tightIsoMVArun2v1DBoldDMwLT.Fill(tau.byTightIsolationMVArun2v1DBoldDMwLT)
+                    pass
+                pass # end loop over selLevels
 
             ##################################################################################
             ##################################################################################
