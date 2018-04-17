@@ -1,7 +1,8 @@
-import ROOT as r
 from LFVAnalysis.LFVHistograms.PhysObjHistos import *
 from LFVAnalysis.LFVHistograms.identificationHistos import identificationHistos
 from LFVAnalysis.LFVUtilities.utilities import selLevels
+
+import ROOT as r
 
 tauDecayLabels = {
         0:"1 prong + 0 pi0",
@@ -49,10 +50,18 @@ class TauIdHistos(identificationHistos):
                                        105,-1.05,1.05)
 
         # 2D Histograms
-        self.decayModeFinding_NewVsOld = r.TH2F("%s_%s_self.decayModeFinding_NewVsOld_%s"%(prefix,physObj,selLevel),
+        self.decayModeFinding_NewVsOld = r.TH2F("%s_%s_decayModeFinding_NewVsOld_%s"%(prefix,physObj,selLevel),
                                        "%s decayModeFindingNewDMs vs. decayModeFindingOld - %s"%(physObj, selLevel),
                                        105,-1.05,1.05,
                                        105,-1.05,1.05)
+
+        self.idLabel_vs_pt = r.TH2F("%s_%s_idLabel_vs_pt_%s"%(prefix,physObj,selLevel),
+                                       "%s idLabel vs. p_{T} - %s"%(physObj, selLevel),
+                                       300,-0.5,2999.5,
+                                       len(tauIdLabels),0.5,len(tauIdLabels)+0.5)
+        for binY,idLabel in enumerate(tauIdLabels):
+            self.idLabel_vs_pt.GetYaxis().SetBinLabel(binY+1,idLabel)
+            pass
 
         return
 
@@ -68,7 +77,8 @@ class TauIdHistos(identificationHistos):
         self.decayModeFindingNewDMs.Write()
         self.againstMuonTight3.Write()
         self.againstElVLooseMVA6.Write()
-        self.self.decayModeFinding_NewVsOld.Write()
+        self.decayModeFinding_NewVsOld.Write()
+        self.idLabel_vs_pt.Write()
 
         return
 

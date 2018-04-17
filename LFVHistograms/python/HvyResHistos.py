@@ -28,6 +28,7 @@ class HvyResDaughterHistos:
         self.dR.Write()
 
         return
+    
 class HvyResMassResolHistos:
     def __init__(self, physObj="HvyRes", selLevel="all"):
         """

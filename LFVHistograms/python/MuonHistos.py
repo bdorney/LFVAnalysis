@@ -46,6 +46,8 @@ class MuonIdHistos(identificationHistos):
                                                    len(muonhitLabels),0.5,len(muonhitLabels)+0.5)
             for binY,hitLabel in enumerate(muonhitLabels):
                 self.dict_hitHistos[idLabel].GetYaxis().SetBinLabel(binY+1,hitLabel)
+                pass
+            pass
 
         return
 

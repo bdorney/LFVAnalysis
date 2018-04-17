@@ -105,17 +105,20 @@ def getSelectedTaus(event, selDict, numTaus, delim="-", listOfBranchNames=None, 
                             event.tau_energy[idx])
 
             # Store Other Properties
-            thisTau.charge = event.tau_charge[idx]
-
-            thisTau.isPF = r.getValFromVectorBool(event.tau_isPFTau, idx)
-
             thisTau.againstElectronVLooseMVA6 = event.tau_againstElectronVLooseMVA6[idx]
             thisTau.againstMuonTight3 = event.tau_againstMuonTight3[idx]
-            thisTau.decayModeFinding = event.tau_decayModeFinding[idx]
-            
-            thisTau.dxy = event.tau_dxy[idx]
             
             thisTau.byTightIsolationMVArun2v1DBoldDMwLT = event.tau_byTightIsolationMVArun2v1DBoldDMwLT[idx]
+            
+            thisTau.charge = event.tau_charge[idx]
+            
+            thisTau.decayMode = event.tau_decayMode[idx]
+            thisTau.decayModeFinding = event.tau_decayModeFinding[idx]
+            thisTau.decayModeFindingNewDMs = event.tau_decayModeFindingNewDMs[idx]
+
+            thisTau.dxy = event.tau_dxy[idx]
+            
+            thisTau.isPF = r.getValFromVectorBool(event.tau_isPFTau, idx)
 
             if debug:
                 print "| %i | %f | %f | %f | %f |"%(idx, thisTau.px(), thisTau.py(), thisTau.pz(), thisTau.E())
