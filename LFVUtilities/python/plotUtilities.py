@@ -165,6 +165,10 @@ def plotObservable(**kwargs):
         else:
             outFileOption = "RECREATE"
 
+    saveImage = False
+    if "saveImage" in kwargs:
+        saveImage = kwargs["saveImage"]
+
     setLogY = False
     if "setLogY" in kwargs:
         setLogY = kwargs["setLogY"]
@@ -176,7 +180,7 @@ def plotObservable(**kwargs):
         pass
 
     selLvlGen = None
-    if "selLvlGen" not in kwargs
+    if "selLvlGen" in kwargs:
         selLvlGen = kwargs["selLvlGen"]
         mcLevels.append("gen")
         pass
@@ -246,8 +250,9 @@ def plotObservable(**kwargs):
                 histoPath = "%s/%s/%s/%s/%s"%(particleName,selLvl,obsType,mcLevels[0],histoName)
                 
                 # Get the plot
+                histo = thisFile.Get(histoPath)
                 dictOfPlots[selLvl][mcLevels[0]] = (
-                        thisFile.Get(histoPath),
+                        histo,
                         selLvl
                         )
                 pass # end loop over selLevels
@@ -261,8 +266,9 @@ def plotObservable(**kwargs):
             histoPath = "%s/%s/%s/%s/%s"%(particleName,selLvlReco,obsType,mcLevels[0],histoName)
             
             # Get the plot
-            dictOfPlots[selLvl][mcLevels[0]] = (
-                    thisFile.Get(histoPath),
+            histo = thisFile.Get(histoPath)
+            dictOfPlots[selLvlReco][mcLevels[0]] = (
+                    histo,
                     "%s: %s"%(mcLevels[0], selLvlReco)
                     )
 
@@ -274,9 +280,10 @@ def plotObservable(**kwargs):
             histoPath = "%s/%s/%s/%s/%s"%(particleName,selLvlReco,obsType,mcLevels[1],histoName)
             
             # Get the plot
-            dictOfPlots[selLvl][mcLevels[1]] = (
-                    thisFile.Get(histoPath),
-                    "%s: %s"%(mcLevels[1], selLvlReco)
+            histo = thisFile.Get(histoPath)
+            dictOfPlots[selLvlGen][mcLevels[1]] = (
+                    histo,
+                    "%s: %s"%(mcLevels[1], selLvlGen)
                     )
             pass # end plotMode == 2
         elif plotMode == 3:
@@ -297,8 +304,9 @@ def plotObservable(**kwargs):
             histoPath = "%s/%s/%s/%s/%s"%(particleName,selLvl,obsType,mcLvl,histoName)
             
             # Get the plot
+            histo = thisFile.Get(histoPath)
             dictOfPlots[selLvl][mcLvl] = (
-                    thisFile.Get(histoPath),
+                    histo,
                     "%s: %s - %s"%(legEntry, mcLvl, selLvl)
                     )
             pass # end plotMode == 3
@@ -334,29 +342,41 @@ def plotObservable(**kwargs):
         pass
 
     # Draw all plots
-    plotLegend = r.Legend(0.5,0.6,0.9,0.9)
+    plotLegend = r.TLegend(0.5,0.6,0.9,0.9)
+    multiGraphObs = r.TMultiGraph("mGraph_%s"%obsName, "") # No concern for axis ranges if used
     for idx,selLvl in enumerate(dictOfPlots.keys()):
-        for mcLvl,plotTuple in dictOfPlots[selLevels].iteritems():
-            if idx == 0:
-                drawOpt = "E1"
-            else:
-                drawOpt = "sameE1"
-                pass
+        for mcLvl,plotTuple in dictOfPlots[selLvl].iteritems():
+            #if idx == 0:
+            #    drawOpt = "APE1"
+            #else:
+            #    drawOpt = "samePE1"
+            #    pass
+
+            # Transform the histogram into a graph
+            thisPlot = r.TGraphErrors(plotTuple[0])
+            graphName = plotTuple[0].GetName()
+            graphName.replace("h_","g_")
+            thisPlot.SetName(graphName)
 
             # Set the style
-            plotTuple[0].SetLineColor(getCyclicColor(idx))
-            plotTuple[0].SetLineWidth(2)
-            plotTuple[0].SetMarkerColor(getCyclicColor(idx))
-            plotTuple[0].SetMarkerSize(0.8)
-            plotTuple[0].SetMarkerStyle(20+idx)
+            thisPlot.SetLineColor(getCyclicColor(idx))
+            thisPlot.SetLineWidth(2)
+            thisPlot.SetMarkerColor(getCyclicColor(idx))
+            thisPlot.SetMarkerSize(0.8)
+            thisPlot.SetMarkerStyle(20+idx)
+            thisPlot.SetTitle("")
 
             # Add to the legend
-            plotLegend.AddEntry(plotTuple[0], plotTuple[1],"LPE")
+            plotLegend.AddEntry(thisPlot, plotTuple[1],"LPE")
             
             # Draw
-            plotTuple[0].Draw(drawOpt)
+            #plotTuple[0].Draw(drawOpt)
+            
+            # Add to multigraph
+            multiGraphObs.Add(thisPlot)
             pass # end loop over inner dict
         pass # end loop over outer dict
+    multiGraphObs.Draw("APE1")
 
     if drawLeg:
         plotLegend.Draw("same")
@@ -365,7 +385,7 @@ def plotObservable(**kwargs):
     if saveImage:
         plotDirName = outFileName.strip(".root")
         plotDirCmd = ['mkdir', '-p', plotDirName]
-        runCommand(plotDirName)
+        runCommand(plotDirCmd)
 
         obsCanvas.SaveAs("%s/%s.png"%(plotDirName,canvName))
         obsCanvas.SaveAs("%s/%s.C"%(plotDirName,canvName))
