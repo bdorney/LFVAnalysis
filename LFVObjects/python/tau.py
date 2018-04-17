@@ -12,9 +12,12 @@ class Tau(PhysObj):
         self.againstElectronVLooseMVA6 = -1e10
         self.againstMuonTight3 = -1e10
         self.decayModeFinding = -1e10
+        self.decayModeFindingNewDMs = -1e10
+
+        self.decayMode = -1
 
         # Isolation
         self.byTightIsolationMVArun2v1DBoldDMwLT = -1e10
+        self.byTightIsolationMVArun2v1DBnewDMwLT = -1e10    # New decay mode 
 
         return
-
