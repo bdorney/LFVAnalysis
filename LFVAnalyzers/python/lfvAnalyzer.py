@@ -7,6 +7,7 @@ from LFVAnalysis.LFVHistograms.TauHistos import tauIdLabels, TauHistos
 from LFVAnalysis.LFVUtilities.getSelection import getSelection
 from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
 from LFVAnalysis.LFVUtilities.selectorEl import getSelectedElectrons, elSelection
+from LFVAnalysis.LFVUtilities.selectorEvent import passesEventFilters, eventSelection
 from LFVAnalysis.LFVUtilities.selectorMuon import getSelectedMuons, muonSelection 
 from LFVAnalysis.LFVUtilities.selectorTau import getSelectedTaus, tauSelection 
 from LFVAnalysis.LFVUtilities.utilities import dR, fillKinematicHistos, selLevels, mcLevels
@@ -48,6 +49,7 @@ class lfvAnalyzer:
         self.useGlobalMuonTrack = False     #If True (False) use Global (IBT) muon track
 
         self.elSel  = elSelection            # Selection Dict - Electrons
+        self.evtSel = eventSelection         # Selection Dict - Events (e.g. event filters)
         self.muonSel= muonSelection          # Selection Dict - Muons
         self.tauSel = tauSelection           # Selection Dict - Taus
 
@@ -131,6 +133,15 @@ class lfvAnalyzer:
 
                 if printTrigInfo:
                     print "trigger selection passed"
+
+            ##################################################################################
+            ##################################################################################
+            # Event Selection
+            ##################################################################################
+            ##################################################################################
+            passedFilters = passesEventFilters(event, self.evtSel, listOfBranchNames=listBNames)
+            if passedFilters==0:
+                continue
 
             ##################################################################################
             ##################################################################################
@@ -466,6 +477,7 @@ class lfvAnalyzer:
         forceDaughterPairOS - Require hvy resonance daughter cand's to have opposite sign charge
         isData              - perform data analysis
         selFileEl           - Text file defining election selection, see getSelection(...)
+        selFileEvt          - Text file defining event filters to use, see getSelection(...)
         selFileMuon         - As selFileEl but for muons
         selFileTau          - As selFileEl but for taus
         sigPdgId1           - particle id of hvy resonance daughter 1
@@ -485,6 +497,8 @@ class lfvAnalyzer:
             self.minDaughterPairdR = kwargs["minDaughterPairdR"] 
         if "selFileEl" in kwargs:
             self.elSel = getSelection(kwargs["selFileEl"])
+        if "selFileEvt" in kwargs:
+            self.evtSel = getSelection(kwargs["selFileEvt"])
         if "selFileMuon" in kwargs:
             self.muonSel = getSelection(kwargs["selFileMuon"])
         if "selFileTau" in kwargs:
