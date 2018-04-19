@@ -38,9 +38,10 @@ def passesEventFilters(event, selDict, delim="-", listOfBranchNames=None, debug=
     evtPassedAllCuts = 1
     for bName,cutTuple in selDict.iteritems():
         if bName in listOfBranchNames:
-            bVal = (getattr( event, bName))[idx]
-            if bName in bitRefBranches:
-                bVal =  r.getValFromVectorBool( getattr( event, bName), idx)
+            #bVal = (getattr( event, bName))[idx]
+            #if bName in bitRefBranches:
+            #    bVal =  r.getValFromVectorBool( getattr( event, bName), idx)
+            bVal = (getattr( event, bName))
             evtPassedAllCuts *= passesCut( bVal, cutTuple[0], cutTuple[1].split(delim) )
             if evtPassedAllCuts == 0:
                 break #Exit cut loop, one cut failed
