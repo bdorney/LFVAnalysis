@@ -55,14 +55,6 @@ class TauIdHistos(identificationHistos):
                                        105,-1.05,1.05,
                                        105,-1.05,1.05)
 
-        self.idLabel_vs_pt = r.TH2F("%s_%s_idLabel_vs_pt_%s"%(prefix,physObj,selLevel),
-                                       "%s idLabel vs. p_{T} - %s"%(physObj, selLevel),
-                                       300,-0.5,2999.5,
-                                       len(tauIdLabels),0.5,len(tauIdLabels)+0.5)
-        for binY,idLabel in enumerate(tauIdLabels):
-            self.idLabel_vs_pt.GetYaxis().SetBinLabel(binY+1,idLabel)
-            pass
-
         return
 
     def write(self, directory):
@@ -78,7 +70,6 @@ class TauIdHistos(identificationHistos):
         self.againstMuonTight3.Write()
         self.againstElVLooseMVA6.Write()
         self.decayModeFinding_NewVsOld.Write()
-        self.idLabel_vs_pt.Write()
 
         return
 
