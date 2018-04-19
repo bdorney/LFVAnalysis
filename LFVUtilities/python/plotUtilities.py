@@ -40,7 +40,7 @@ def getCyclicMarker(idx, modulo=10, markers=None):
 
     return (20 + (idx % modulo) )
 
-def plotObservable(**kwargs):
+def plotObservable1D(**kwargs):
     """
     Makes a plot comparing a given observable (obsName) from a class of observable 
     types (obsType) for a given particle species (particleName)
@@ -62,10 +62,10 @@ def plotObservable(**kwargs):
                               will be appended with "data"
         
         obsName             - Name of observable, see the lists stored 
-                              in supObservables
+                              in supObservables1D
         
         obsType             - Name of observable type, see keys of 
-                              supObservables
+                              supObservables1D
         
         particleName        - Name of the particle, see supParticleNames 
                               for possible values
@@ -96,7 +96,7 @@ def plotObservable(**kwargs):
     """
 
     from LFVAnalysis.LFVUtilities.nesteddict import nesteddict
-    from LFVAnalysis.LFVUtilities.utilities import selLevels, supObservables, supParticleNames
+    from LFVAnalysis.LFVUtilities.utilities import selLevels, supObservables1D, supParticleNames
     from LFVAnalysis.LFVUtilities.wrappers import runCommand
 
     import os
@@ -116,30 +116,30 @@ def plotObservable(**kwargs):
     obsType         = kwargs["obsType"]
     particleName    = kwargs["particleName"]
     
-    if obsType not in supObservables.keys():
-        print("plotObservable() - Usage Error:")
+    if obsType not in supObservables1D.keys():
+        print("plotObservable1D() - Usage Error:")
         print("\tThe obsType '%s' is not understood."%(obsType))
         print("\tPlease choose from the following list:")
         print("")
-        print("\t",supObservables.keys())
+        print("\t",supObservables1D.keys())
         print("")
         print("Exiting")
         exit(os.EX_USAGE)
         pass
 
-    if obsName not in supObservables[obsType]:
-        print("plotObservable() - Usage Error:")
+    if obsName not in supObservables1D[obsType]:
+        print("plotObservable1D() - Usage Error:")
         print("\tThe obsName '%s' of type '%s' is not understood."%(obsName,obsType))
         print("\tPlease choose from the following list for this type:")
         print("")
-        print("\t",supObservables[obsType])
+        print("\t",supObservables1D[obsType])
         print("")
         print("Exiting")
         exit(os.EX_USAGE)
         pass
 
     if particleName not in supParticleNames:
-        print("plotObservable() - Usage Error:")
+        print("plotObservable1D() - Usage Error:")
         print("\tThe particleName '%s' is not understood."%(particleName))
         print("\tPlease choose from the following list for this type:")
         print("")
@@ -209,7 +209,7 @@ def plotObservable(**kwargs):
          ):
         plotMode = 1
     else:
-        print("plotObservable() - Usage Error:")
+        print("plotObservable1D() - Usage Error:")
         print("\tUnable to determine the operating mode, possible modes are:")
         print("\t\t1. One input File and neither selLvlReco or selLvlGen supplied")
         print("\t\t2. One input File and both selLvlReco and selLvlGen supplied")

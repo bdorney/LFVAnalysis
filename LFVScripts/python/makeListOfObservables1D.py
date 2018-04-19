@@ -12,15 +12,15 @@ if __name__ == '__main__':
     dictOfObsFiles = nesteddict()
 
     # Setup baseline (e.g. kinematics)
-    from LFVAnalysis.LFVUtilities.utilities import supObservables, supParticleNames
+    from LFVAnalysis.LFVUtilities.utilities import supObservables1D, supParticleNames
     for partName in supParticleNames:
         # open the file
-        dictOfObsFiles[partName] = open("%s/Examples/listOfObservables_%s.txt"%(lfvPath,partName), 'w+')
+        dictOfObsFiles[partName] = open("%s/Examples/listOfObservables1D_%s.txt"%(lfvPath,partName), 'w+')
         
         # automatic entry
         # write the kinematic observables
         dictOfObsFiles[partName].write('#particle name, observable type, observable name\n')
-        for obs in supObservables["Kinematics"]:
+        for obs in supObservables1D["Kinematics"]:
             dictOfObsFiles[partName].write("%s,Kinematics,%s\n"%(partName,obs))
             pass # end writing kinematics
 
@@ -44,6 +44,7 @@ if __name__ == '__main__':
             dictOfObsFiles[partName].write("%s,Identification,againstElVLooseMVA6\n"%partName)
             dictOfObsFiles[partName].write("%s,Identification,againstMuonTight3\n"%partName)
             dictOfObsFiles[partName].write("%s,Identification,decayModeFinding\n"%partName)
+            dictOfObsFiles[partName].write("%s,Identification,decayModeFindingNewDMs\n"%partName)
             dictOfObsFiles[partName].write("%s,Isolation,tightIsoMVArun2v1DBoldBMwLT\n"%partName)
 
         # close the file

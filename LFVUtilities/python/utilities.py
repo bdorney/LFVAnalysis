@@ -24,37 +24,54 @@ supOperators = (
         "le"    #less than or equal too
         )
 
-# Supported Observable Types
-supObservables = {
+# Supported Observable Types - 1D
+supObservables1D = {
         "DaughterHistos":[
             "dR"
             ],
         "Kinematics":[
             "charge",
+            "dRGen",
+            "dRGenMatched",
             "energy",
             "eta",
             "mass",
             "multi",
             "pt",
+            "ptRes",
             "pz"
             ],
         "Identification":[
-            "againstElVLooseMVA6",
-            "againstMuonTight3",
-            "decayModeFinding",
+            "againstElVLooseMVA6",          # tau specific
+            "againstMuonTight3",            # tau specific 
+            "decayModeFinding",             # tau specific
+            "decayModeFindingNewDMs",       # tau specific
             "dxy",
             "dz",
             "idLabel",
             "normChi2",
             ],
         "Isolation":[
-            "isoTrkBased03",
-            "tightIsoMVArun2v1DBoldDMwLT"
+            "isoTrkBased03",                # mu specific
+            "tightIsoMVArun2v1DBoldDMwLT"   # tau specific
             ],
         "MassResolution":[
             "massResol"
             ]
         }
+
+# Supported Observable Types - 2D
+supObservables2D = {
+        "Identification":[
+            "hitInfo",                      # muon specific
+            "decayModeFinding_NewVsOld",    # tau specific
+            "idLabel_vs_pt",
+            "idLabel_vs_ptRes"
+            ]
+
+
+        }
+
 
 # Supported Particle Names
 supParticleNames = (
@@ -99,8 +116,15 @@ def fillKinematicHistos(candidate, kinHistos, fillGen=True):
     kinHistos.mass.Fill(candidate.M())
     kinHistos.pt.Fill(candidate.pt())
     kinHistos.pz.Fill(candidate.pz())
-    if fillGen:
-        kinHistos.dRMatched.Fill(dR(candidate, candidate.matchedGenObj))
+    if (candidate.isMatched and fillGen is True):
+        #print ("| pdgId %i | isMatched %i | fillGen %i | dR %f | ptRes %f"%(
+        #    candidate.pdgId,
+        #    candidate.isMatched,
+        #    fillGen,
+        #    dR(candidate, candidate.matchedGenObj),
+        #    calcObsResolution(candidate.pt(), candidate.matchedGenObj.pt() ) )
+        #    )
+        kinHistos.dRGenMatched.Fill(dR(candidate, candidate.matchedGenObj))
         kinHistos.ptRes.Fill(calcObsResolution(candidate.pt(), candidate.matchedGenObj.pt() ) )
         pass
 
@@ -108,8 +132,9 @@ def fillKinematicHistos(candidate, kinHistos, fillGen=True):
 
 def matchObjsBydR(listReco,listGen,maxdR=0.5,debug=False):    
     """
-    Matches objects in listGen to objects in listReco by dR matching.
-    The best match will be used. A match is found if:
+    Returns listReco after objects have been Matched to elements of 
+    listGen by dR matching. The best pairing of (reco,gen) will be 
+    found. A possible match is considered if:
 
         dR(listReco[i],listGen[j]) < maxdR
 
@@ -156,7 +181,7 @@ def matchObjsBydR(listReco,listGen,maxdR=0.5,debug=False):
             pass # end matching
         pass # end loop over arrayPossibleMatches
 
-    return arrayPossibleMatches
+    return listReco
 
 def passesCut(valOfInterest, cutVal, listOfCutStrings):
     """

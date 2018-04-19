@@ -121,7 +121,7 @@ if __name__ == '__main__':
         options.outFile = options.obsFile.strip('.txt')
         options.outFile += ".root"
     
-    from LFVAnalysis.LFVUtilities.plotUtilities import plotObservable
+    from LFVAnalysis.LFVUtilities.plotUtilities import plotObservable1D
     for idx,obsTuple in enumerate(listOfObsTuples):
         if idx==0:
             rootOpt = "RECREATE"
@@ -129,7 +129,7 @@ if __name__ == '__main__':
             rootOpt = "UPDATE"
             pass
         
-        plotObservable(
+        plotObservable1D(
                 dictOfInputFiles = dictOfInputFiles,
                 obsName = obsTuple[2],
                 obsType = obsTuple[1],
