@@ -54,7 +54,14 @@ class PhysObj:
         return self.fourVector.E()
   
     def eta(self):
-        return self.fourVector.Eta()
+        cosTheta = self.fourVector.CosTheta()
+        if ( (cosTheta*cosTheta) < 1): # otherwise spits out warnings
+            return self.fourVector.Eta()
+        else:
+            if self.pz() > 0:
+                return 10e10
+            else: 
+                return -10e10
 
     def phi(self):
         return self.fourVector.Phi()
