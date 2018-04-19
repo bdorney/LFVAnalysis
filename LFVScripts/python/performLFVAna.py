@@ -53,6 +53,11 @@ if __name__ == '__main__':
                 selFileEl=options.selFileEl
                 )
         pass
+    if options.selFileEvt is not None:
+        lfvAna.setAnalysisFlags(
+                selFileEvt=options.selFileEvt
+                )
+        pass
     if options.selFileMuon is not None:
         lfvAna.setAnalysisFlags(
                 selFileMuon=options.selFileMuon

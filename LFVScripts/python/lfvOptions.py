@@ -30,6 +30,8 @@ extSelGroup = OptionGroup(
         "Options which allow you to specify external files which define the selection dictionaries for given object")
 extSelGroup.add_option("--selFileEl", type="string",dest="selFileEl",default=None,
         help="File specifying electron selection", metavar="selFileEl")
+extSelGroup.add_option("--selFileEvt", type="string",dest="selFileEvt",default=None,
+        help="File specifying event filters", metavar="selFileEvt")
 extSelGroup.add_option("--selFileMuon", type="string",dest="selFileMuon",default=None,
         help="File specifying muon selection", metavar="selFileMuon")
 extSelGroup.add_option("--selFileTau", type="string",dest="selFileTau",default=None,

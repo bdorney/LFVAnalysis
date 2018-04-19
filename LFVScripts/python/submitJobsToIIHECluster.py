@@ -106,6 +106,8 @@ if __name__ == '__main__':
             print pythonCmd
         if options.selFileEl is not None:
             pythonCmd += ' --selFileEl=%s'%(options.selFileEl)
+        if options.selFileEvt is not None:
+            pythonCmd += ' --selFileEvt=%s'%(options.selFileEvt)
         if options.selFileMuon is not None:
             pythonCmd += ' --selFileMuon=%s'%(options.selFileMuon)
         if options.selFileTau is not None:
