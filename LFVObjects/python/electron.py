@@ -9,5 +9,8 @@ class Electron(PhysObj):
         # Id Variables
         self.isHEEP = -1
 
+        # Track quality
+        #self.normChi2 = -1e10
+        
         return
 
